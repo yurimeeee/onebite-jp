@@ -1,0 +1,199 @@
+import { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  Pressable,
+  TextInput,
+  ScrollView,
+  ActivityIndicator,
+  Alert,
+} from "react-native";
+import { useRouter } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { colors } from "@/constants/theme";
+import { PillButton } from "@/components/PillButton";
+import { useAuthStore } from "@/store/authStore";
+
+const SAVED_EMAIL_KEY = "saved_email";
+const REMEMBER_EMAIL_KEY = "remember_email";
+
+export default function LoginScreen() {
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const login = useAuthStore((s) => s.login);
+  const googleLogin = useAuthStore((s) => s.googleLogin);
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberEmail, setRememberEmail] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const remember = await AsyncStorage.getItem(REMEMBER_EMAIL_KEY);
+        if (remember === "true") {
+          setRememberEmail(true);
+          const saved = await AsyncStorage.getItem(SAVED_EMAIL_KEY);
+          if (saved) setEmail(saved);
+        }
+      } catch {}
+    })();
+  }, []);
+
+  const saveEmailPreference = async (emailToSave: string) => {
+    try {
+      if (rememberEmail) {
+        await AsyncStorage.setItem(SAVED_EMAIL_KEY, emailToSave);
+        await AsyncStorage.setItem(REMEMBER_EMAIL_KEY, "true");
+      } else {
+        await AsyncStorage.removeItem(SAVED_EMAIL_KEY);
+        await AsyncStorage.removeItem(REMEMBER_EMAIL_KEY);
+      }
+    } catch {}
+  };
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("오류", "이메일과 비밀번호를 입력해주세요.");
+      return;
+    }
+    setLoading(true);
+    try {
+      await saveEmailPreference(email);
+      await login(email, password);
+    } catch (error: any) {
+      Alert.alert("로그인 실패", error.message ?? "다시 시도해주세요.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setGoogleLoading(true);
+    try {
+      await googleLogin();
+    } catch (error: any) {
+      Alert.alert("Google 로그인 실패", error.message ?? "다시 시도해주세요.");
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
+  return (
+    <ScrollView
+      className="flex-1 bg-background"
+      contentContainerStyle={{
+        flexGrow: 1,
+        paddingHorizontal: 24,
+        paddingTop: insets.top + 16,
+        paddingBottom: insets.bottom + 24,
+      }}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+    >
+      {/* 히어로 */}
+      <View className="items-center py-6">
+        <View className="h-16 w-16 items-center justify-center rounded-card bg-pastel-lime">
+          <Ionicons name="restaurant" size={30} color={colors.textPrimary} />
+        </View>
+        <Text className="mt-4 text-3xl font-bold text-text-primary">원바이트</Text>
+        <Text className="mt-2 text-center text-sm leading-5 text-text-secondary">
+          하루 한 입, 부담 없이 씹어 먹는{"\n"}일본어 단어 학습
+        </Text>
+      </View>
+
+      {/* 로그인 폼 */}
+      <View className="mt-4 gap-3">
+        <TextInput
+          className="rounded-2xl px-5 py-4 text-base text-text-primary"
+          style={{ backgroundColor: colors.surface2 }}
+          placeholder="이메일"
+          placeholderTextColor={colors.textSecondary}
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+        />
+
+        <View className="flex-row items-center rounded-2xl px-5" style={{ backgroundColor: "#F6F6F6" }}>
+          <TextInput
+            className="flex-1 py-4 text-base text-text-primary"
+            placeholder="비밀번호"
+            placeholderTextColor={colors.textSecondary}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!showPassword}
+          />
+          <Pressable onPress={() => setShowPassword((v) => !v)} hitSlop={8}>
+            <Ionicons
+              name={showPassword ? "eye-off-outline" : "eye-outline"}
+              size={20}
+              color={colors.textSecondary}
+            />
+          </Pressable>
+        </View>
+
+        <Pressable
+          className="flex-row items-center gap-2 py-1"
+          onPress={() => setRememberEmail((v) => !v)}
+        >
+          <View
+            className="h-5 w-5 items-center justify-center rounded-md"
+            style={{
+              backgroundColor: rememberEmail ? colors.primary : "#F6F6F6",
+              borderWidth: rememberEmail ? 0 : 1,
+              borderColor: colors.border,
+            }}
+          >
+            {rememberEmail ? (
+              <Ionicons name="checkmark" size={14} color={colors.surface} />
+            ) : null}
+          </View>
+          <Text className="text-sm text-text-secondary">이메일 저장</Text>
+        </Pressable>
+
+        <PillButton
+          label="로그인"
+          onPress={handleLogin}
+          loading={loading}
+          icon="arrow-forward"
+        />
+
+        <View className="my-1 flex-row items-center gap-3">
+          <View className="h-px flex-1" style={{ backgroundColor: colors.border }} />
+          <Text className="text-xs text-text-secondary">또는</Text>
+          <View className="h-px flex-1" style={{ backgroundColor: colors.border }} />
+        </View>
+
+        <Pressable
+          onPress={handleGoogleLogin}
+          disabled={googleLoading}
+          className="flex-row items-center justify-center gap-3 rounded-pill border-2 border-border bg-surface py-4 active:scale-[0.98]"
+        >
+          {googleLoading ? (
+            <ActivityIndicator color={colors.textPrimary} />
+          ) : (
+            <>
+              <Ionicons name="logo-google" size={20} color="#EA4335" />
+              <Text className="text-base font-bold text-text-primary">
+                Google로 계속하기
+              </Text>
+            </>
+          )}
+        </Pressable>
+
+        <View className="mt-2 flex-row justify-center gap-1">
+          <Text className="text-sm text-text-secondary">계정이 없으신가요?</Text>
+          <Pressable onPress={() => router.push("/signup")}>
+            <Text className="text-sm font-bold text-primary">회원가입</Text>
+          </Pressable>
+        </View>
+      </View>
+    </ScrollView>
+  );
+}
