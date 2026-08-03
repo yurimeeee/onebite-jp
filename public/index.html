@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="%LANG_ISO_CODE%">
+  <head>
+    <meta charset="utf-8" />
+    <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>%WEB_TITLE%</title>
+    <!-- The `react-native-web` recommended style reset: https://necolas.github.io/react-native-web/docs/setup/#root-element -->
+    <style id="expo-reset">
+      /* These styles make the body full-height */
+      html,
+      body {
+        height: calc(var(--vh, 1dvh) * 100);
+      }
+      /* These styles disable body scrolling if you are using <ScrollView> */
+      body {
+        overflow: hidden;
+      }
+      /* These styles make the root element full-height */
+      #root {
+        display: flex;
+        height: calc(var(--vh, 1dvh) * 100);
+        flex: 1;
+      }
+    </style>
+    <!-- 모바일 Safari는 100dvh가 중첩 flex 레이아웃에서 주소창 접힘에 맞춰
+         즉시 갱신되지 않는 경우가 있어, 실제 보이는 뷰포트 높이를 읽어 --vh로 반영한다. -->
+    <script>
+      (function () {
+        function setVh() {
+          var h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+          document.documentElement.style.setProperty('--vh', h * 0.01 + 'px');
+        }
+        setVh();
+        window.addEventListener('resize', setVh);
+        window.addEventListener('orientationchange', setVh);
+        if (window.visualViewport) {
+          window.visualViewport.addEventListener('resize', setVh);
+        }
+      })();
+    </script>
+  </head>
+
+  <body>
+    <!-- Use static rendering with Expo Router to support running without JavaScript. -->
+    <noscript>
+      You need to enable JavaScript to run this app.
+    </noscript>
+    <!-- The root element for your Expo app. -->
+    <div id="root"></div>
+  </body>
+</html>

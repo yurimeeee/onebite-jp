@@ -25,3 +25,4 @@ expo-env.d.ts
 .claude/
 .vercel
 .env*
+.gstack/

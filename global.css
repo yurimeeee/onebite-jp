@@ -2,10 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 모바일 Safari/Chrome은 height:100%를 주소창이 접힌 최대 뷰포트 기준으로 계산해서
-   실제 보이는 영역보다 커지는 경우가 있다. dvh로 실제 뷰포트에 맞춘다. */
+/* 모바일 Safari는 height:100%/100dvh가 중첩된 flex 레이아웃 안에서
+   주소창 접힘에 맞춰 즉시 갱신되지 않는 경우가 있다. app/+html.tsx에서
+   window.visualViewport.height를 읽어 --vh를 실시간으로 갱신하고,
+   JS 실행 전(또는 --vh 미지원 상황)에는 100dvh를 폴백으로 쓴다. */
 html,
 body,
 #root {
-  height: 100dvh;
+  height: calc(var(--vh, 1dvh) * 100);
 }
