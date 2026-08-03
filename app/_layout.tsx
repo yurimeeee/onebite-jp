@@ -8,6 +8,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { onAuthStateChanged } from "firebase/auth";
 import { colors } from "@/constants/theme";
 import { auth } from "@/services/firebase";
+import { formatDateKey, getAttendance } from "@/services/quiz";
 import { useAuthStore } from "@/store/authStore";
 import { useSettingsStore } from "@/store/settingsStore";
 import { useWrongAnswerStore } from "@/store/wrongAnswerStore";
@@ -41,6 +42,15 @@ export default function RootLayout() {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
       setLoading(false);
+      if (firebaseUser) {
+        getAttendance(firebaseUser.uid)
+          .then((attended) => {
+            useNotificationStore
+              .getState()
+              .syncStreakWarningForToday(attended.has(formatDateKey(new Date())));
+          })
+          .catch(() => {});
+      }
     });
     useSettingsStore.getState().hydrate();
     useWrongAnswerStore.getState().hydrate();
@@ -57,7 +67,7 @@ export default function RootLayout() {
         <StatusBar style="dark" />
         {/* 웹 데스크톱: 중앙 모바일 프레임으로 정렬, 네이티브: 그대로 전체 화면 */}
         <View className="flex-1 items-center justify-center bg-background">
-          <View className="w-full max-w-md flex-1 overflow-hidden bg-background web:min-h-screen web:shadow-sm web:border-x web:border-border/50">
+          <View className="w-full max-w-md flex-1 overflow-hidden bg-background web:shadow-sm web:border-x web:border-border/50">
             <Stack
               screenOptions={{
                 headerShown: false,

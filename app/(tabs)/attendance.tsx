@@ -5,6 +5,7 @@ import { useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "@/constants/theme";
 import { useAuthStore } from "@/store/authStore";
+import { useNotificationStore } from "@/store/notificationStore";
 import {
   calcStreak,
   checkInToday,
@@ -91,6 +92,7 @@ export default function AttendanceScreen() {
     try {
       await checkInToday(user.uid);
       setAttended((prev) => new Set(prev).add(todayKey));
+      useNotificationStore.getState().syncStreakWarningForToday(true);
     } catch {
     } finally {
       setChecking(false);

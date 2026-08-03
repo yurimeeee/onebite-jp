@@ -15,15 +15,31 @@ function formatTime(hour: number, minute: number) {
   return `${period} ${displayHour}시${minute ? ` ${minute}분` : ""}`;
 }
 
-export default function NotificationsScreen() {
-  const router = useRouter();
-  const insets = useSafeAreaInsets();
-  const enabled = useNotificationStore((s) => s.enabled);
-  const hour = useNotificationStore((s) => s.hour);
-  const minute = useNotificationStore((s) => s.minute);
-  const supported = useNotificationStore((s) => s.supported);
-  const setEnabled = useNotificationStore((s) => s.setEnabled);
-  const setTime = useNotificationStore((s) => s.setTime);
+function ReminderCard({
+  icon,
+  iconBg,
+  title,
+  description,
+  unsupportedDescription,
+  supported,
+  enabled,
+  hour,
+  minute,
+  onToggle,
+  onTimeChange,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  iconBg: string;
+  title: string;
+  description: string;
+  unsupportedDescription: string;
+  supported: boolean;
+  enabled: boolean;
+  hour: number;
+  minute: number;
+  onToggle: (next: boolean) => Promise<boolean>;
+  onTimeChange: (hour: number, minute: number) => void;
+}) {
   const [busy, setBusy] = useState(false);
   const [showAndroidPicker, setShowAndroidPicker] = useState(false);
   const [pickerHour, setPickerHour] = useState(hour);
@@ -36,7 +52,7 @@ export default function NotificationsScreen() {
 
   useEffect(() => {
     if (pickerHour === hour && pickerMinute === minute) return;
-    const timer = setTimeout(() => setTime(pickerHour, pickerMinute), 400);
+    const timer = setTimeout(() => onTimeChange(pickerHour, pickerMinute), 400);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pickerHour, pickerMinute]);
@@ -47,13 +63,13 @@ export default function NotificationsScreen() {
     return d;
   }, [pickerHour, pickerMinute]);
 
-  const onToggle = async (next: boolean) => {
+  const handleToggle = async (next: boolean) => {
     if (!supported) {
       Alert.alert("모바일 앱에서 이용해주세요", "학습 알림은 iOS/Android 앱에서만 지원돼요.");
       return;
     }
     setBusy(true);
-    const ok = await setEnabled(next);
+    const ok = await onToggle(next);
     setBusy(false);
     if (next && !ok) {
       Alert.alert(
@@ -61,10 +77,7 @@ export default function NotificationsScreen() {
         "기기 설정에서 원바이트의 알림 권한을 허용해주세요.",
         [
           { text: "취소", style: "cancel" },
-          {
-            text: "설정으로 이동",
-            onPress: () => Linking.openSettings(),
-          },
+          { text: "설정으로 이동", onPress: () => Linking.openSettings() },
         ]
       );
     }
@@ -78,42 +91,24 @@ export default function NotificationsScreen() {
   };
 
   return (
-    <ScrollView
-      className="flex-1 bg-background"
-      contentContainerStyle={{ padding: 20, paddingTop: insets.top + 12, paddingBottom: 40 }}
-      showsVerticalScrollIndicator={false}
-    >
-      <View className="flex-row items-center gap-3">
-        <Pressable
-          hitSlop={12}
-          onPress={() => router.back()}
-          className="h-10 w-10 items-center justify-center rounded-pill bg-surface"
-          style={{ borderWidth: 1, borderColor: colors.border }}
-        >
-          <Ionicons name="chevron-back" size={20} color={colors.textPrimary} />
-        </Pressable>
-        <Text className="text-2xl font-bold text-text-primary">알림 설정</Text>
-      </View>
-
-      <View className="mt-8 overflow-hidden rounded-card bg-surface">
+    <View className="mt-6">
+      <View className="overflow-hidden rounded-card bg-surface">
         <View className="flex-row items-center gap-3 px-5 py-4">
           <View
             className="h-10 w-10 items-center justify-center rounded-pill"
-            style={{ backgroundColor: colors.pastelPeachLight }}
+            style={{ backgroundColor: iconBg }}
           >
-            <Ionicons name="notifications-outline" size={18} color={colors.textPrimary} />
+            <Ionicons name={icon} size={18} color={colors.textPrimary} />
           </View>
           <View className="flex-1">
-            <Text className="text-base font-semibold text-text-primary">학습 리마인더</Text>
+            <Text className="text-base font-semibold text-text-primary">{title}</Text>
             <Text className="mt-0.5 text-xs text-text-secondary">
-              {supported
-                ? "매일 정해진 시간에 학습 알림을 보내드려요"
-                : "모바일 앱에서만 지원돼요"}
+              {supported ? description : unsupportedDescription}
             </Text>
           </View>
           <Switch
             value={enabled}
-            onValueChange={onToggle}
+            onValueChange={handleToggle}
             disabled={busy || !supported}
             trackColor={{ false: colors.border, true: colors.primary }}
             thumbColor={colors.surface}
@@ -122,7 +117,7 @@ export default function NotificationsScreen() {
       </View>
 
       {enabled ? (
-        <View className="mt-6">
+        <View className="mt-3">
           <Text className="mb-3 text-sm font-bold text-text-secondary">
             알림 시간 · {formatTime(pickerHour, pickerMinute)}
           </Text>
@@ -160,6 +155,72 @@ export default function NotificationsScreen() {
           )}
         </View>
       ) : null}
+    </View>
+  );
+}
+
+export default function NotificationsScreen() {
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const supported = useNotificationStore((s) => s.supported);
+
+  const enabled = useNotificationStore((s) => s.enabled);
+  const hour = useNotificationStore((s) => s.hour);
+  const minute = useNotificationStore((s) => s.minute);
+  const setEnabled = useNotificationStore((s) => s.setEnabled);
+  const setTime = useNotificationStore((s) => s.setTime);
+
+  const streakWarningEnabled = useNotificationStore((s) => s.streakWarningEnabled);
+  const streakWarningHour = useNotificationStore((s) => s.streakWarningHour);
+  const streakWarningMinute = useNotificationStore((s) => s.streakWarningMinute);
+  const setStreakWarningEnabled = useNotificationStore((s) => s.setStreakWarningEnabled);
+  const setStreakWarningTime = useNotificationStore((s) => s.setStreakWarningTime);
+
+  return (
+    <ScrollView
+      className="flex-1 bg-background"
+      contentContainerStyle={{ padding: 20, paddingTop: insets.top + 12, paddingBottom: 40 }}
+      showsVerticalScrollIndicator={false}
+    >
+      <View className="flex-row items-center gap-3">
+        <Pressable
+          hitSlop={12}
+          onPress={() => router.back()}
+          className="h-10 w-10 items-center justify-center rounded-pill bg-surface"
+          style={{ borderWidth: 1, borderColor: colors.border }}
+        >
+          <Ionicons name="chevron-back" size={20} color={colors.textPrimary} />
+        </Pressable>
+        <Text className="text-2xl font-bold text-text-primary">알림 설정</Text>
+      </View>
+
+      <ReminderCard
+        icon="notifications-outline"
+        iconBg={colors.pastelPeachLight}
+        title="학습 리마인더"
+        description="매일 정해진 시간에 학습 알림을 보내드려요"
+        unsupportedDescription="모바일 앱에서만 지원돼요"
+        supported={supported}
+        enabled={enabled}
+        hour={hour}
+        minute={minute}
+        onToggle={setEnabled}
+        onTimeChange={setTime}
+      />
+
+      <ReminderCard
+        icon="flame-outline"
+        iconBg={colors.pastelAmberLight}
+        title="스트릭 경고"
+        description="오늘 아직 출석 안 했으면 스트릭이 끊기기 전에 알려드려요"
+        unsupportedDescription="모바일 앱에서만 지원돼요"
+        supported={supported}
+        enabled={streakWarningEnabled}
+        hour={streakWarningHour}
+        minute={streakWarningMinute}
+        onToggle={setStreakWarningEnabled}
+        onTimeChange={setStreakWarningTime}
+      />
     </ScrollView>
   );
 }
