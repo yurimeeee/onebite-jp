@@ -7,38 +7,24 @@
     <title>%WEB_TITLE%</title>
     <!-- The `react-native-web` recommended style reset: https://necolas.github.io/react-native-web/docs/setup/#root-element -->
     <style id="expo-reset">
-      /* These styles make the body full-height */
       html,
       body {
-        height: calc(var(--vh, 1dvh) * 100);
+        height: 100%;
+        margin: 0;
       }
       /* These styles disable body scrolling if you are using <ScrollView> */
       body {
         overflow: hidden;
       }
-      /* These styles make the root element full-height */
+      /* 모바일 Safari는 height:100%/100dvh가 중첩 flex 레이아웃 안에서 주소창
+         접힘에 맞춰 즉시 갱신되지 않는 경우가 있다. position:fixed + inset:0은
+         뷰포트 단위 계산에 기대지 않고 항상 실제 보이는 영역에 고정된다. */
       #root {
+        position: fixed;
+        inset: 0;
         display: flex;
-        height: calc(var(--vh, 1dvh) * 100);
-        flex: 1;
       }
     </style>
-    <!-- 모바일 Safari는 100dvh가 중첩 flex 레이아웃에서 주소창 접힘에 맞춰
-         즉시 갱신되지 않는 경우가 있어, 실제 보이는 뷰포트 높이를 읽어 --vh로 반영한다. -->
-    <script>
-      (function () {
-        function setVh() {
-          var h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
-          document.documentElement.style.setProperty('--vh', h * 0.01 + 'px');
-        }
-        setVh();
-        window.addEventListener('resize', setVh);
-        window.addEventListener('orientationchange', setVh);
-        if (window.visualViewport) {
-          window.visualViewport.addEventListener('resize', setVh);
-        }
-      })();
-    </script>
   </head>
 
   <body>
