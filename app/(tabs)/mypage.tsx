@@ -93,11 +93,11 @@ export default function MyPageScreen() {
   const menu: {
     icon: keyof typeof Ionicons.glyphMap;
     label: string;
-    href?: "/settings" | "/quiz/review" | "/quiz/saved";
+    href?: "/settings" | "/notifications" | "/quiz/review" | "/quiz/saved";
     badge?: number;
   }[] = [
     { icon: "repeat-outline", label: "오답노트", href: "/quiz/review", badge: wrongCount },
-    { icon: "notifications-outline", label: "알림 설정" },
+    { icon: "notifications-outline", label: "알림 설정", href: "/notifications" },
     { icon: "bookmark-outline", label: "저장한 단어", href: "/quiz/saved", badge: savedCount },
     { icon: "help-circle-outline", label: "도움말" },
     { icon: "settings-outline", label: "환경 설정", href: "/settings" },
