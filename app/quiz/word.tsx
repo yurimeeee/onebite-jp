@@ -12,6 +12,7 @@ import { PillButton } from "@/components/PillButton";
 import { useAuthStore } from "@/store/authStore";
 import { useSettingsStore } from "@/store/settingsStore";
 import { useWrongAnswerStore } from "@/store/wrongAnswerStore";
+import { useSavedWordsStore } from "@/store/savedWordsStore";
 import { getWordsForDay, markDayCompleted } from "@/services/quiz";
 import type { Word } from "@/types/quiz";
 import { shuffle } from "@/utils/shuffle";
@@ -61,6 +62,8 @@ export default function WordQuizScreen() {
   const soundEnabled = useSettingsStore((s) => s.soundEnabled);
   const addWrong = useWrongAnswerStore((s) => s.addWrong);
   const removeWrong = useWrongAnswerStore((s) => s.removeWrong);
+  const isSaved = useSavedWordsStore((s) => (q ? s.isSaved(q.wordId) : false));
+  const toggleSave = useSavedWordsStore((s) => s.toggleSave);
 
   const speak = () => {
     if (!q || !soundEnabled) return;
@@ -153,13 +156,28 @@ export default function WordQuizScreen() {
       >
         <Text className="text-6xl font-bold text-text-primary">{q.jp}</Text>
         <Text className="mt-3 text-xl text-text-secondary">{q.kana}</Text>
-        <Pressable
-          onPress={speak}
-          className="mt-6 h-12 w-12 items-center justify-center rounded-pill active:scale-95"
-          style={{ backgroundColor: colors.pastelCyanLight }}
-        >
-          <Ionicons name="volume-high" size={22} color={colors.primary} />
-        </Pressable>
+        <View className="mt-6 flex-row gap-3">
+          <Pressable
+            onPress={speak}
+            className="h-12 w-12 items-center justify-center rounded-pill active:scale-95"
+            style={{ backgroundColor: colors.pastelCyanLight }}
+          >
+            <Ionicons name="volume-high" size={22} color={colors.primary} />
+          </Pressable>
+          <Pressable
+            onPress={() =>
+              toggleSave({ id: q.wordId, word: q, level: levelKey, addedAt: Date.now() })
+            }
+            className="h-12 w-12 items-center justify-center rounded-pill active:scale-95"
+            style={{ backgroundColor: colors.pastelPinkLight }}
+          >
+            <Ionicons
+              name={isSaved ? "bookmark" : "bookmark-outline"}
+              size={20}
+              color={colors.primary}
+            />
+          </Pressable>
+        </View>
       </Animated.View>
 
       <Text className="mb-3 mt-8 text-base font-semibold text-text-secondary">

@@ -11,6 +11,7 @@ import { auth } from "@/services/firebase";
 import { useAuthStore } from "@/store/authStore";
 import { useSettingsStore } from "@/store/settingsStore";
 import { useWrongAnswerStore } from "@/store/wrongAnswerStore";
+import { useSavedWordsStore } from "@/store/savedWordsStore";
 
 function useProtectedRoute() {
   const segments = useSegments() as string[];
@@ -42,6 +43,7 @@ export default function RootLayout() {
     });
     useSettingsStore.getState().hydrate();
     useWrongAnswerStore.getState().hydrate();
+    useSavedWordsStore.getState().hydrate();
     return unsubscribe;
   }, []);
 
@@ -70,6 +72,7 @@ export default function RootLayout() {
               <Stack.Screen name="quiz/word" />
               <Stack.Screen name="quiz/blank" />
               <Stack.Screen name="quiz/review" />
+              <Stack.Screen name="quiz/saved" />
               <Stack.Screen
                 name="quiz/result"
                 options={{ animation: "fade", gestureEnabled: false }}

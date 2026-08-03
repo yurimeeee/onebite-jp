@@ -36,3 +36,10 @@ export interface WrongAnswerItem {
   wordOptions?: string[];
   quiz?: FillInBlankQuiz;
 }
+
+export interface SavedWordItem {
+  id: string;
+  word: Word;
+  level: LevelKey;
+  addedAt: number;
+}

@@ -6,6 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { colors, levels } from "@/constants/theme";
 import { useAuthStore } from "@/store/authStore";
 import { useWrongAnswerStore } from "@/store/wrongAnswerStore";
+import { useSavedWordsStore } from "@/store/savedWordsStore";
 import {
   calcStreak,
   getAttendance,
@@ -36,6 +37,7 @@ export default function MyPageScreen() {
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
   const wrongCount = useWrongAnswerStore((s) => s.items.length);
+  const savedCount = useSavedWordsStore((s) => s.items.length);
 
   const [loading, setLoading] = useState(true);
   const [lastStudy, setLastStudy] = useState<UserLastStudyInfo | null>(null);
@@ -91,12 +93,12 @@ export default function MyPageScreen() {
   const menu: {
     icon: keyof typeof Ionicons.glyphMap;
     label: string;
-    href?: "/settings" | "/quiz/review";
+    href?: "/settings" | "/quiz/review" | "/quiz/saved";
     badge?: number;
   }[] = [
     { icon: "repeat-outline", label: "오답노트", href: "/quiz/review", badge: wrongCount },
     { icon: "notifications-outline", label: "알림 설정" },
-    { icon: "bookmark-outline", label: "저장한 단어" },
+    { icon: "bookmark-outline", label: "저장한 단어", href: "/quiz/saved", badge: savedCount },
     { icon: "help-circle-outline", label: "도움말" },
     { icon: "settings-outline", label: "환경 설정", href: "/settings" },
   ];
