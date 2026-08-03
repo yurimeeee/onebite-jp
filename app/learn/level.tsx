@@ -7,13 +7,14 @@ import { ScreenHeader } from "@/components/ScreenHeader";
 const MODE_LABEL: Record<string, string> = {
   word: "단어 퀴즈",
   blank: "빈칸 채우기",
+  listen: "리스닝 퀴즈",
 };
 
 export default function LevelSelectScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { mode } = useLocalSearchParams<{ mode: string }>();
-  const modeKey = mode === "blank" ? "blank" : "word";
+  const modeKey = mode === "blank" ? "blank" : mode === "listen" ? "listen" : "word";
 
   const selectLevel = (level: LevelKey) => {
     if (modeKey === "blank") {

@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "@/constants/theme";
 
-type Mode = "word" | "blank";
+type Mode = "word" | "blank" | "listen";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -42,6 +42,14 @@ export default function HomeScreen() {
           minutes={5}
           icon="create"
           bg={colors.pastelAmberLight}
+        />
+        <ModeCard
+          onPress={() => selectMode("listen")}
+          title="리스닝 퀴즈"
+          desc="발음을 듣고 뜻 맞히기"
+          minutes={4}
+          icon="headset"
+          bg={colors.pastelPinkLight}
         />
       </View>
     </ScrollView>

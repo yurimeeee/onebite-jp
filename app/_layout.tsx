@@ -84,6 +84,7 @@ export default function RootLayout() {
               <Stack.Screen name="learn/day" />
               <Stack.Screen name="quiz/word" />
               <Stack.Screen name="quiz/blank" />
+              <Stack.Screen name="quiz/listen" />
               <Stack.Screen name="quiz/review" />
               <Stack.Screen name="quiz/saved" />
               <Stack.Screen

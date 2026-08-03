@@ -28,7 +28,8 @@ export default function ResultScreen() {
   const total = Number(params.total ?? 1);
   const wrong = Math.max(total - correct, 0);
   const seconds = Number(params.time ?? 0);
-  const mode = params.mode === "blank" ? "blank" : "word";
+  const mode =
+    params.mode === "blank" ? "blank" : params.mode === "listen" ? "listen" : "word";
   const percent = Math.round((correct / total) * 100);
   const passed = percent >= 60;
 

@@ -35,12 +35,14 @@ export default function ReviewQuizScreen() {
   const q = session?.[index];
   const revealed = selected !== null;
 
+  const isWordLike = q?.mode === "word" || q?.mode === "listen";
+
   const wordChoices = useMemo(() => {
-    if (!q || q.mode !== "word" || !q.word) return [];
+    if (!q || !isWordLike || !q.word) return [];
     return q.wordOptions && q.wordOptions.length > 0
       ? q.wordOptions
       : [q.word.ko];
-  }, [q]);
+  }, [q, isWordLike]);
 
   const blankOptions = useMemo(() => {
     if (!q || q.mode !== "blank" || !q.quiz) return [];
@@ -168,7 +170,7 @@ export default function ReviewQuizScreen() {
 
   if (!q) return null;
 
-  if (q.mode === "word" && q.word) {
+  if (isWordLike && q.word) {
     const word = q.word;
     return (
       <View

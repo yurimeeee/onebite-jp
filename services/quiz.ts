@@ -10,32 +10,58 @@ import {
 import { db } from "@/services/firebase";
 import type { FillInBlankQuiz, Levels, Word } from "@/types/quiz";
 import type { UserLastStudyInfo } from "@/types/user";
+import { getCached, getCachedPersistent, invalidateCache } from "@/utils/cache";
+
+// 퀴즈 콘텐츠(레벨/단어/빈칸문제)는 거의 바뀌지 않으므로 기기에 영속 캐시하고,
+// 하루 단위로만 갱신해 콘텐츠 업데이트를 반영한다.
+const CONTENT_TTL = 24 * 60 * 60 * 1000;
+// 유저 진행 데이터는 학습/출석 후 곧바로 바뀔 수 있어 짧은 TTL만 두고,
+// 실제 변경 지점(markDayCompleted, checkInToday)에서 캐시를 즉시 무효화한다.
+const USER_TTL = 60 * 1000;
 
 export async function getDaysForLevel(level: Levels): Promise<number[]> {
-  const snapshot = await getDocs(collection(db, "quizzes", level, "days"));
-  return snapshot.docs
-    .map((d) => d.data().day as number)
-    .sort((a, b) => a - b);
+  return getCachedPersistent(
+    `days:${level}`,
+    async () => {
+      const snapshot = await getDocs(collection(db, "quizzes", level, "days"));
+      return snapshot.docs
+        .map((d) => d.data().day as number)
+        .sort((a, b) => a - b);
+    },
+    CONTENT_TTL
+  );
 }
 
 export async function getWordsForDay(
   level: Levels,
   day: number
 ): Promise<Word[]> {
-  const snapshot = await getDoc(
-    doc(db, "quizzes", level, "days", `day${day}`)
+  return getCachedPersistent(
+    `words:${level}:${day}`,
+    async () => {
+      const snapshot = await getDoc(
+        doc(db, "quizzes", level, "days", `day${day}`)
+      );
+      if (!snapshot.exists()) return [];
+      return snapshot.data().words as Word[];
+    },
+    CONTENT_TTL
   );
-  if (!snapshot.exists()) return [];
-  return snapshot.data().words as Word[];
 }
 
 export async function getFillInBlankQuizzes(
   level: Levels
 ): Promise<FillInBlankQuiz[]> {
-  const snapshot = await getDocs(
-    collection(db, "fill_in_the_blank_quizzes", level, "quizzes")
+  return getCachedPersistent(
+    `blank:${level}`,
+    async () => {
+      const snapshot = await getDocs(
+        collection(db, "fill_in_the_blank_quizzes", level, "quizzes")
+      );
+      return snapshot.docs.map((d) => d.data() as FillInBlankQuiz);
+    },
+    CONTENT_TTL
   );
-  return snapshot.docs.map((d) => d.data() as FillInBlankQuiz);
 }
 
 export type HistoryEntry = {
@@ -47,12 +73,18 @@ export type HistoryEntry = {
 export async function getUserHistoryMap(
   uid: string
 ): Promise<Record<string, HistoryEntry>> {
-  const snapshot = await getDocs(collection(db, "users", uid, "history"));
-  const map: Record<string, HistoryEntry> = {};
-  snapshot.docs.forEach((d) => {
-    map[d.id] = d.data() as HistoryEntry;
-  });
-  return map;
+  return getCached(
+    `history:${uid}`,
+    async () => {
+      const snapshot = await getDocs(collection(db, "users", uid, "history"));
+      const map: Record<string, HistoryEntry> = {};
+      snapshot.docs.forEach((d) => {
+        map[d.id] = d.data() as HistoryEntry;
+      });
+      return map;
+    },
+    USER_TTL
+  );
 }
 
 export async function markDayCompleted(
@@ -80,14 +112,25 @@ export async function markDayCompleted(
     last_study_level: level,
     last_study_day: day,
   });
+
+  invalidateCache(`history:${uid}`);
+  invalidateCache(`lastStudy:${uid}`);
 }
 
 export async function getLastStudy(
   uid: string
 ): Promise<UserLastStudyInfo | null> {
-  const snapshot = await getDoc(doc(db, "users", uid, "last_study", "info"));
-  if (!snapshot.exists()) return null;
-  return snapshot.data() as UserLastStudyInfo;
+  return getCached(
+    `lastStudy:${uid}`,
+    async () => {
+      const snapshot = await getDoc(
+        doc(db, "users", uid, "last_study", "info")
+      );
+      if (!snapshot.exists()) return null;
+      return snapshot.data() as UserLastStudyInfo;
+    },
+    USER_TTL
+  );
 }
 
 export function formatDateKey(date: Date): string {
@@ -108,8 +151,16 @@ export function calcStreak(attended: Set<string>, today: Date): number {
 }
 
 export async function getAttendance(uid: string): Promise<Set<string>> {
-  const snapshot = await getDocs(collection(db, "users", uid, "attendance"));
-  return new Set(snapshot.docs.map((d) => d.id));
+  return getCached(
+    `attendance:${uid}`,
+    async () => {
+      const snapshot = await getDocs(
+        collection(db, "users", uid, "attendance")
+      );
+      return new Set(snapshot.docs.map((d) => d.id));
+    },
+    USER_TTL
+  );
 }
 
 export async function checkInToday(uid: string): Promise<string> {
@@ -118,5 +169,6 @@ export async function checkInToday(uid: string): Promise<string> {
     date: todayKey,
     timestamp: serverTimestamp(),
   });
+  invalidateCache(`attendance:${uid}`);
   return todayKey;
 }
