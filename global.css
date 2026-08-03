@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* 모바일 Safari/Chrome은 height:100%를 주소창이 접힌 최대 뷰포트 기준으로 계산해서
+   실제 보이는 영역보다 커지는 경우가 있다. dvh로 실제 뷰포트에 맞춘다. */
+html,
+body,
+#root {
+  height: 100dvh;
+}
