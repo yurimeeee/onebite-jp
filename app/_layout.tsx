@@ -1,7 +1,7 @@
 import "../global.css";
 import { useEffect } from "react";
 import { View } from "react-native";
-import { Stack, useRouter, useSegments } from "expo-router";
+import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -17,34 +17,15 @@ import { useNotificationStore } from "@/store/notificationStore";
 import { useAchievementStore } from "@/store/achievementStore";
 import { useGoalStore } from "@/store/goalStore";
 
-function useProtectedRoute() {
-  const segments = useSegments() as string[];
-  const router = useRouter();
-  const user = useAuthStore((s) => s.user);
-  const loading = useAuthStore((s) => s.loading);
-  const dailyGoal = useGoalStore((s) => s.dailyGoal);
-  const goalKnown = useGoalStore((s) => s.known);
-
-  useEffect(() => {
-    if (loading) return;
-
-    const inAuthGroup = segments.length === 0 || segments[0] === "signup";
-    // 로그인은 했지만 아직 학습 목표를 고르지 않은 유저 (신규가입 여부와 무관하게 항상 체크한다)
-    const needsGoal = !!user && goalKnown && !dailyGoal;
-
-    if (!user && !inAuthGroup) {
-      router.replace("/");
-    } else if (user && inAuthGroup) {
-      router.replace(needsGoal ? "/goal" : "/(tabs)");
-    } else if (needsGoal && segments[0] !== "goal") {
-      router.replace("/goal");
-    }
-  }, [user, loading, segments, dailyGoal, goalKnown]);
-}
-
 export default function RootLayout() {
   const setUser = useAuthStore((s) => s.setUser);
   const setLoading = useAuthStore((s) => s.setLoading);
+  const user = useAuthStore((s) => s.user);
+  const authLoading = useAuthStore((s) => s.loading);
+  const dailyGoal = useGoalStore((s) => s.dailyGoal);
+  const goalKnown = useGoalStore((s) => s.known);
+  // 로그인은 했지만 아직 학습 목표를 고르지 않은 유저 (신규가입 여부와 무관하게 항상 체크한다)
+  const needsGoal = !!user && goalKnown && !dailyGoal;
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
@@ -71,8 +52,6 @@ export default function RootLayout() {
     return unsubscribe;
   }, []);
 
-  useProtectedRoute();
-
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
@@ -87,28 +66,36 @@ export default function RootLayout() {
                 animation: "slide_from_right",
               }}
             >
-              <Stack.Screen name="index" />
-              <Stack.Screen name="signup" />
-              <Stack.Screen name="goal" />
-              <Stack.Screen name="(tabs)" />
-              <Stack.Screen name="settings" />
-              <Stack.Screen name="notifications" />
-              <Stack.Screen name="achievements" />
-              <Stack.Screen name="leaderboard" />
-              <Stack.Screen name="learn/level" />
-              <Stack.Screen name="learn/day" />
-              <Stack.Screen name="quiz/word" />
-              <Stack.Screen name="quiz/blank" />
-              <Stack.Screen name="quiz/listen" />
-              <Stack.Screen name="quiz/review" />
-              <Stack.Screen name="quiz/saved" />
-              <Stack.Screen name="modes/swipe" />
-              <Stack.Screen name="modes/radio" />
-              <Stack.Screen name="modes/timeattack" />
-              <Stack.Screen
-                name="quiz/result"
-                options={{ animation: "fade", gestureEnabled: false }}
-              />
+              <Stack.Protected guard={!authLoading && !user}>
+                <Stack.Screen name="index" />
+                <Stack.Screen name="signup" />
+              </Stack.Protected>
+
+              <Stack.Protected guard={!authLoading && !!user && needsGoal}>
+                <Stack.Screen name="goal" />
+              </Stack.Protected>
+
+              <Stack.Protected guard={!authLoading && !!user && !needsGoal}>
+                <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="settings" />
+                <Stack.Screen name="notifications" />
+                <Stack.Screen name="achievements" />
+                <Stack.Screen name="leaderboard" />
+                <Stack.Screen name="learn/level" />
+                <Stack.Screen name="learn/day" />
+                <Stack.Screen name="quiz/word" />
+                <Stack.Screen name="quiz/blank" />
+                <Stack.Screen name="quiz/listen" />
+                <Stack.Screen name="quiz/review" />
+                <Stack.Screen name="quiz/saved" />
+                <Stack.Screen name="modes/swipe" />
+                <Stack.Screen name="modes/radio" />
+                <Stack.Screen name="modes/timeattack" />
+                <Stack.Screen
+                  name="quiz/result"
+                  options={{ animation: "fade", gestureEnabled: false }}
+                />
+              </Stack.Protected>
             </Stack>
           </View>
         </View>

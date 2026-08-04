@@ -1,5 +1,5 @@
-import { useCallback, useState } from "react";
-import { View, Text, ScrollView, Pressable, ActivityIndicator } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { View, Text, ScrollView, Pressable } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -18,6 +18,7 @@ import { getUserProfile } from "@/services/profile";
 import { BadgeUnlockOverlay } from "@/components/BadgeUnlockOverlay";
 import { PillButton } from "@/components/PillButton";
 import { ShareCardModal } from "@/components/ShareCardModal";
+import { Skeleton } from "@/components/Skeleton";
 import type { Badge } from "@/constants/achievements";
 import type { UserLastStudyInfo } from "@/types/user";
 
@@ -46,6 +47,7 @@ export default function MyPageScreen() {
   const savedCount = useSavedWordsStore((s) => s.items.length);
 
   const [loading, setLoading] = useState(true);
+  const [showSkeleton, setShowSkeleton] = useState(false);
   const [lastStudy, setLastStudy] = useState<UserLastStudyInfo | null>(null);
   const [completedDays, setCompletedDays] = useState(0);
   const [accuracy, setAccuracy] = useState<number | null>(null);
@@ -100,6 +102,16 @@ export default function MyPageScreen() {
     }, [user?.uid])
   );
 
+  // 데이터가 금방 도착하면 스켈레톤을 아예 보여주지 않도록 살짝 지연 후 표시
+  useEffect(() => {
+    if (!loading) {
+      setShowSkeleton(false);
+      return;
+    }
+    const timer = setTimeout(() => setShowSkeleton(true), 250);
+    return () => clearTimeout(timer);
+  }, [loading]);
+
   const displayName =
     nickname || user?.displayName || user?.email?.split("@")[0] || "학습자";
   const levelInfo = levels.find((l) => l.key === lastStudy?.last_study_level);
@@ -152,10 +164,47 @@ export default function MyPageScreen() {
         </View>
       </View>
 
-      {loading ? (
-        <View className="mt-6 items-center py-6">
-          <ActivityIndicator color={colors.primary} />
-        </View>
+      {showSkeleton ? (
+        <>
+          {/* 최근 학습 스켈레톤 */}
+          <View className="mt-6 rounded-card bg-surface p-5">
+            <Text className="text-sm font-bold text-primary">최근 학습</Text>
+            <View className="mt-3 gap-3">
+              <View className="flex-row items-center justify-between">
+                <Skeleton width={40} height={14} />
+                <Skeleton width={100} height={14} />
+              </View>
+              <View className="flex-row items-center justify-between">
+                <Skeleton width={40} height={14} />
+                <Skeleton width={70} height={14} />
+              </View>
+              <View className="flex-row items-center justify-between">
+                <Skeleton width={70} height={14} />
+                <Skeleton width={60} height={14} />
+              </View>
+            </View>
+          </View>
+
+          {/* 통계 카드 스켈레톤 */}
+          <View className="mt-4 flex-row gap-3">
+            {[0, 1, 2].map((i) => (
+              <View
+                key={i}
+                className="flex-1 items-center rounded-card py-5"
+                style={{ backgroundColor: colors.surface2 }}
+              >
+                <Skeleton width={22} height={22} radius={11} />
+                <Skeleton width={36} height={20} style={{ marginTop: 8 }} />
+                <Skeleton width={48} height={11} style={{ marginTop: 6 }} />
+              </View>
+            ))}
+          </View>
+
+          {/* 학습 카드 공유 버튼 스켈레톤 */}
+          <View className="mt-4">
+            <Skeleton height={48} radius={999} />
+          </View>
+        </>
       ) : (
         <>
           {/* 최근 학습 */}
@@ -252,9 +301,8 @@ export default function MyPageScreen() {
 
       {/* 로그아웃 */}
       <Pressable
-        onPress={async () => {
-          await logout();
-          router.replace("/");
+        onPress={() => {
+          logout();
         }}
         className="mt-6 flex-row items-center justify-center gap-2 rounded-pill border-2 border-border bg-surface py-4 active:scale-[0.98]"
       >

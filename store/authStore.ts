@@ -63,9 +63,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: async () => {
     await signOut(auth);
     if (Platform.OS !== "web" && GoogleSignin) {
-      try {
-        await GoogleSignin.signOut();
-      } catch {}
+      // 구글 토큰 폐기는 네트워크 호출이라 느릴 수 있어 화면 전환을 막지 않도록 백그라운드로 처리
+      GoogleSignin.signOut().catch(() => {});
     }
   },
 
