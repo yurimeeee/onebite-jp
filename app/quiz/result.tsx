@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { View, Text } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -6,6 +7,8 @@ import { colors } from "@/constants/theme";
 import { AccuracyRing } from "@/components/AccuracyRing";
 import { Confetti } from "@/components/Confetti";
 import { PillButton } from "@/components/PillButton";
+import { BadgeUnlockOverlay } from "@/components/BadgeUnlockOverlay";
+import { BADGES } from "@/constants/achievements";
 
 function formatTime(seconds: number) {
   if (seconds < 60) return `${seconds}초`;
@@ -22,7 +25,13 @@ export default function ResultScreen() {
     total?: string;
     mode?: string;
     time?: string;
+    newBadges?: string;
   }>();
+
+  const [newBadges, setNewBadges] = useState(() => {
+    const ids = params.newBadges?.split(",").filter(Boolean) ?? [];
+    return BADGES.filter((b) => ids.includes(b.id));
+  });
 
   const correct = Number(params.correct ?? 0);
   const total = Number(params.total ?? 1);
@@ -100,6 +109,8 @@ export default function ResultScreen() {
           />
         ) : null}
       </View>
+
+      <BadgeUnlockOverlay badges={newBadges} onClose={() => setNewBadges([])} />
     </View>
   );
 }

@@ -13,6 +13,9 @@ import {
   getLastStudy,
   getUserHistoryMap,
 } from "@/services/quiz";
+import { checkAchievements } from "@/services/achievements";
+import { BadgeUnlockOverlay } from "@/components/BadgeUnlockOverlay";
+import type { Badge } from "@/constants/achievements";
 import type { UserLastStudyInfo } from "@/types/user";
 
 function formatRelative(timestamp: { seconds: number } | null | undefined) {
@@ -44,6 +47,7 @@ export default function MyPageScreen() {
   const [completedDays, setCompletedDays] = useState(0);
   const [accuracy, setAccuracy] = useState<number | null>(null);
   const [streak, setStreak] = useState(0);
+  const [newBadges, setNewBadges] = useState<Badge[]>([]);
 
   useFocusEffect(
     useCallback(() => {
@@ -75,6 +79,9 @@ export default function MyPageScreen() {
           }
           setLastStudy(last);
           setStreak(calcStreak(attendance, new Date()));
+
+          const unlocked = await checkAchievements(user.uid);
+          if (!cancelled && unlocked.length > 0) setNewBadges(unlocked);
         } catch {
         } finally {
           if (!cancelled) setLoading(false);
@@ -94,9 +101,10 @@ export default function MyPageScreen() {
   const menu: {
     icon: keyof typeof Ionicons.glyphMap;
     label: string;
-    href?: "/settings" | "/notifications" | "/quiz/review" | "/quiz/saved";
+    href?: "/settings" | "/notifications" | "/quiz/review" | "/quiz/saved" | "/achievements";
     badge?: number;
   }[] = [
+    { icon: "trophy-outline", label: "업적", href: "/achievements" },
     { icon: "repeat-outline", label: "오답노트", href: "/quiz/review", badge: wrongCount },
     { icon: "notifications-outline", label: "알림 설정", href: "/notifications" },
     { icon: "bookmark-outline", label: "저장한 단어", href: "/quiz/saved", badge: savedCount },
@@ -229,6 +237,8 @@ export default function MyPageScreen() {
           로그아웃
         </Text>
       </Pressable>
+
+      <BadgeUnlockOverlay badges={newBadges} onClose={() => setNewBadges([])} />
     </ScrollView>
   );
 }

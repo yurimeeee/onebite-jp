@@ -14,6 +14,7 @@ import { useSettingsStore } from "@/store/settingsStore";
 import { useWrongAnswerStore } from "@/store/wrongAnswerStore";
 import { useSavedWordsStore } from "@/store/savedWordsStore";
 import { getWordsForDay, markDayCompleted } from "@/services/quiz";
+import { checkAchievements } from "@/services/achievements";
 import type { Word } from "@/types/quiz";
 import { shuffle } from "@/utils/shuffle";
 
@@ -94,13 +95,16 @@ export default function WordQuizScreen() {
   const next = async () => {
     if (index + 1 >= total) {
       const seconds = Math.round((Date.now() - startedAt) / 1000);
+      let newBadgeIds: string[] = [];
       if (user?.uid) {
         try {
           await markDayCompleted(user.uid, levelKey, dayNumber, correctCount, total);
         } catch {}
+        newBadgeIds = (await checkAchievements(user.uid)).map((b) => b.id);
       }
+      const badgeParam = newBadgeIds.length > 0 ? `&newBadges=${newBadgeIds.join(",")}` : "";
       router.replace(
-        `/quiz/result?correct=${correctCount}&total=${total}&mode=word&time=${seconds}`
+        `/quiz/result?correct=${correctCount}&total=${total}&mode=word&time=${seconds}${badgeParam}`
       );
       return;
     }

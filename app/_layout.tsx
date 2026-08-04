@@ -14,6 +14,7 @@ import { useSettingsStore } from "@/store/settingsStore";
 import { useWrongAnswerStore } from "@/store/wrongAnswerStore";
 import { useSavedWordsStore } from "@/store/savedWordsStore";
 import { useNotificationStore } from "@/store/notificationStore";
+import { useAchievementStore } from "@/store/achievementStore";
 
 function useProtectedRoute() {
   const segments = useSegments() as string[];
@@ -56,6 +57,7 @@ export default function RootLayout() {
     useWrongAnswerStore.getState().hydrate();
     useSavedWordsStore.getState().hydrate();
     useNotificationStore.getState().hydrate();
+    useAchievementStore.getState().hydrate();
     return unsubscribe;
   }, []);
 
@@ -80,6 +82,7 @@ export default function RootLayout() {
               <Stack.Screen name="(tabs)" />
               <Stack.Screen name="settings" />
               <Stack.Screen name="notifications" />
+              <Stack.Screen name="achievements" />
               <Stack.Screen name="learn/level" />
               <Stack.Screen name="learn/day" />
               <Stack.Screen name="quiz/word" />

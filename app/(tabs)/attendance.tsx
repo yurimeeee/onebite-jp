@@ -12,6 +12,9 @@ import {
   formatDateKey,
   getAttendance,
 } from "@/services/quiz";
+import { checkAchievements } from "@/services/achievements";
+import { BadgeUnlockOverlay } from "@/components/BadgeUnlockOverlay";
+import type { Badge } from "@/constants/achievements";
 
 const WEEK = ["일", "월", "화", "수", "목", "금", "토"];
 
@@ -49,6 +52,7 @@ export default function AttendanceScreen() {
   const [checking, setChecking] = useState(false);
   const [viewYear, setViewYear] = useState(today.getFullYear());
   const [viewMonth, setViewMonth] = useState(today.getMonth());
+  const [newBadges, setNewBadges] = useState<Badge[]>([]);
 
   useFocusEffect(
     useCallback(() => {
@@ -93,6 +97,8 @@ export default function AttendanceScreen() {
       await checkInToday(user.uid);
       setAttended((prev) => new Set(prev).add(todayKey));
       useNotificationStore.getState().syncStreakWarningForToday(true);
+      const unlocked = await checkAchievements(user.uid);
+      if (unlocked.length > 0) setNewBadges(unlocked);
     } catch {
     } finally {
       setChecking(false);
@@ -260,6 +266,8 @@ export default function AttendanceScreen() {
           </View>
         )}
       </View>
+
+      <BadgeUnlockOverlay badges={newBadges} onClose={() => setNewBadges([])} />
     </ScrollView>
   );
 }
