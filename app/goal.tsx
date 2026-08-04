@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { View, Text, Pressable, ScrollView } from "react-native";
+import { View, Text, Pressable, ScrollView, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
 import { colors } from "@/constants/theme";
 import { DAILY_GOALS, type DailyGoalKey } from "@/constants/goals";
 import { PillButton } from "@/components/PillButton";
@@ -14,6 +15,7 @@ export default function GoalScreen() {
   const user = useAuthStore((s) => s.user);
   const currentGoal = useGoalStore((s) => s.dailyGoal);
   const setGoal = useGoalStore((s) => s.setGoal);
+  const isChanging = !!currentGoal;
 
   const [selected, setSelected] = useState<DailyGoalKey>(
     currentGoal ?? DAILY_GOALS.find((g) => g.recommended)!.key
@@ -25,9 +27,14 @@ export default function GoalScreen() {
     setSaving(true);
     try {
       await setGoal(user.uid, selected);
-      router.replace("/(tabs)");
-    } catch {
+      if (isChanging) {
+        router.back();
+      } else {
+        router.replace("/(tabs)");
+      }
+    } catch (error: any) {
       setSaving(false);
+      Alert.alert("저장 실패", error?.message ?? "목표를 저장하지 못했어요. 다시 시도해주세요.");
     }
   };
 
@@ -42,6 +49,17 @@ export default function GoalScreen() {
       }}
       showsVerticalScrollIndicator={false}
     >
+      {isChanging ? (
+        <Pressable
+          hitSlop={12}
+          onPress={() => router.back()}
+          className="mb-4 h-10 w-10 items-center justify-center rounded-pill bg-surface"
+          style={{ borderWidth: 1, borderColor: colors.border }}
+        >
+          <Ionicons name="chevron-back" size={20} color={colors.textPrimary} />
+        </Pressable>
+      ) : null}
+
       <Text className="text-center text-2xl font-bold text-text-primary">
         매일 얼마 동안{"\n"}공부하고 싶으신가요?
       </Text>

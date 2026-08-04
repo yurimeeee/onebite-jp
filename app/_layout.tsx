@@ -71,7 +71,10 @@ export default function RootLayout() {
                 <Stack.Screen name="signup" />
               </Stack.Protected>
 
-              <Stack.Protected guard={!authLoading && !!user && needsGoal}>
+              {/* goal 화면은 needsGoal 여부와 무관하게 로그인만 하면 항상 접근 가능해야 한다.
+                  다른 그룹에 중복 선언하면 guard가 false인 쪽에서 전역적으로 제외 처리되어
+                  버리므로(내부 protectedScreens 집합), 반드시 이 블록 하나에만 선언한다. */}
+              <Stack.Protected guard={!authLoading && !!user}>
                 <Stack.Screen name="goal" />
               </Stack.Protected>
 
@@ -79,6 +82,7 @@ export default function RootLayout() {
                 <Stack.Screen name="(tabs)" />
                 <Stack.Screen name="settings" />
                 <Stack.Screen name="notifications" />
+                <Stack.Screen name="help" />
                 <Stack.Screen name="achievements" />
                 <Stack.Screen name="leaderboard" />
                 <Stack.Screen name="learn/level" />

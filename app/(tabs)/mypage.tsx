@@ -127,7 +127,8 @@ export default function MyPageScreen() {
       | "/quiz/saved"
       | "/achievements"
       | "/leaderboard"
-      | "/goal";
+      | "/goal"
+      | "/help";
     badge?: number;
   }[] = [
     { icon: "trophy-outline", label: "업적", href: "/achievements" },
@@ -136,7 +137,7 @@ export default function MyPageScreen() {
     { icon: "repeat-outline", label: "오답노트", href: "/quiz/review", badge: wrongCount },
     { icon: "notifications-outline", label: "알림 설정", href: "/notifications" },
     { icon: "bookmark-outline", label: "저장한 단어", href: "/quiz/saved", badge: savedCount },
-    { icon: "help-circle-outline", label: "도움말" },
+    { icon: "help-circle-outline", label: "도움말", href: "/help" },
     { icon: "settings-outline", label: "환경 설정", href: "/settings" },
   ];
 
