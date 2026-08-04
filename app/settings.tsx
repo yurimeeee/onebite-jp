@@ -1,13 +1,18 @@
-import { View, Text, Pressable, ScrollView, Switch } from "react-native";
+import { useEffect, useState } from "react";
+import { View, Text, Pressable, ScrollView, Switch, TextInput, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "@/constants/theme";
 import { SPEECH_RATES, useSettingsStore, type SpeechRate } from "@/store/settingsStore";
+import { useAuthStore } from "@/store/authStore";
+import { getUserProfile, setNickname as saveNickname } from "@/services/profile";
+import { PillButton } from "@/components/PillButton";
 
 export default function SettingsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const user = useAuthStore((s) => s.user);
   const soundEnabled = useSettingsStore((s) => s.soundEnabled);
   const vibrationEnabled = useSettingsStore((s) => s.vibrationEnabled);
   const furiganaEnabled = useSettingsStore((s) => s.furiganaEnabled);
@@ -16,6 +21,38 @@ export default function SettingsScreen() {
   const toggleVibration = useSettingsStore((s) => s.toggleVibration);
   const toggleFurigana = useSettingsStore((s) => s.toggleFurigana);
   const setSpeechRate = useSettingsStore((s) => s.setSpeechRate);
+
+  const [nickname, setNicknameInput] = useState("");
+  const [savedNickname, setSavedNickname] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!user?.uid) return;
+    getUserProfile(user.uid)
+      .then((profile) => {
+        setNicknameInput(profile.nickname ?? "");
+        setSavedNickname(profile.nickname);
+      })
+      .catch(() => {});
+  }, [user?.uid]);
+
+  const trimmedNickname = nickname.trim();
+  const canSave =
+    !!user?.uid && trimmedNickname.length > 0 && trimmedNickname.length <= 12 &&
+    trimmedNickname !== (savedNickname ?? "");
+
+  const handleSaveNickname = async () => {
+    if (!user?.uid || !canSave) return;
+    setSaving(true);
+    try {
+      await saveNickname(user.uid, trimmedNickname);
+      setSavedNickname(trimmedNickname);
+    } catch (error: any) {
+      Alert.alert("저장 실패", error.message ?? "다시 시도해주세요.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <ScrollView
@@ -33,6 +70,33 @@ export default function SettingsScreen() {
           <Ionicons name="chevron-back" size={20} color={colors.textPrimary} />
         </Pressable>
         <Text className="text-2xl font-bold text-text-primary">환경 설정</Text>
+      </View>
+
+      <Text className="mb-3 mt-8 text-sm font-bold text-text-secondary">닉네임</Text>
+      <View className="rounded-card bg-surface p-4">
+        <Text className="mb-3 text-xs text-text-secondary">
+          주간 랭킹과 학습 인증 카드에 표시될 이름이에요 (최대 12자)
+        </Text>
+        <View className="flex-row items-center gap-2">
+          <TextInput
+            className="flex-1 rounded-2xl px-4 py-3 text-base text-text-primary"
+            style={{ backgroundColor: colors.surface2 }}
+            placeholder="닉네임을 입력해주세요"
+            placeholderTextColor={colors.textSecondary}
+            value={nickname}
+            onChangeText={setNicknameInput}
+            maxLength={12}
+          />
+        </View>
+        <View className="mt-3">
+          <PillButton
+            label="닉네임 저장"
+            variant={canSave ? "primary" : "secondary"}
+            disabled={!canSave}
+            loading={saving}
+            onPress={handleSaveNickname}
+          />
+        </View>
       </View>
 
       <View className="mt-8 overflow-hidden rounded-card bg-surface">

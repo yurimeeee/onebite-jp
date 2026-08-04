@@ -7,14 +7,17 @@ import { colors, type LevelKey } from "@/constants/theme";
 import { QuizHeader } from "@/components/QuizHeader";
 import { ChoiceButton } from "@/components/ChoiceButton";
 import { PillButton } from "@/components/PillButton";
+import { useAuthStore } from "@/store/authStore";
 import { useWrongAnswerStore } from "@/store/wrongAnswerStore";
 import { getFillInBlankQuizzes } from "@/services/quiz";
+import { awardWeeklyXP } from "@/services/leaderboard";
 import type { FillInBlankQuiz } from "@/types/quiz";
 import { shuffle } from "@/utils/shuffle";
 
 export default function BlankQuizScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const user = useAuthStore((s) => s.user);
   const { level } = useLocalSearchParams<{ level: string }>();
   const levelKey = level as LevelKey;
 
@@ -62,9 +65,14 @@ export default function BlankQuizScreen() {
     }
   };
 
-  const next = () => {
+  const next = async () => {
     if (index + 1 >= total) {
       const seconds = Math.round((Date.now() - startedAt) / 1000);
+      if (user?.uid && correctCount > 0) {
+        try {
+          await awardWeeklyXP(user.uid, correctCount * 10);
+        } catch {}
+      }
       router.replace(
         `/quiz/result?correct=${correctCount}&total=${total}&mode=blank&time=${seconds}`
       );

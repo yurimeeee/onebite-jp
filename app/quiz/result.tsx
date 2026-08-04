@@ -8,7 +8,9 @@ import { AccuracyRing } from "@/components/AccuracyRing";
 import { Confetti } from "@/components/Confetti";
 import { PillButton } from "@/components/PillButton";
 import { BadgeUnlockOverlay } from "@/components/BadgeUnlockOverlay";
+import { ShareCardModal } from "@/components/ShareCardModal";
 import { BADGES } from "@/constants/achievements";
+import { useAuthStore } from "@/store/authStore";
 
 function formatTime(seconds: number) {
   if (seconds < 60) return `${seconds}초`;
@@ -20,6 +22,8 @@ function formatTime(seconds: number) {
 export default function ResultScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const user = useAuthStore((s) => s.user);
+  const [shareVisible, setShareVisible] = useState(false);
   const params = useLocalSearchParams<{
     correct?: string;
     total?: string;
@@ -108,11 +112,40 @@ export default function ResultScreen() {
             onPress={() => router.replace("/quiz/review")}
           />
         ) : null}
+        {passed ? (
+          <PillButton
+            label="인증 카드 공유"
+            variant="ghost"
+            icon="share-outline"
+            onPress={() => setShareVisible(true)}
+          />
+        ) : null}
       </View>
 
       <BadgeUnlockOverlay badges={newBadges} onClose={() => setNewBadges([])} />
+
+      <ShareCardModal
+        visible={shareVisible}
+        onClose={() => setShareVisible(false)}
+        nickname={user?.displayName || user?.email?.split("@")[0] || "학습자"}
+        headline="퀴즈를 완료했어요!"
+        stats={[
+          { label: "정답률", value: `${percent}%` },
+          { label: "맞은 문항", value: `${correct}/${total}` },
+          { label: "소요 시간", value: formatTime(seconds) },
+        ]}
+        dateLabel={formatToday()}
+        fileName="onebite-quiz-result"
+      />
     </View>
   );
+}
+
+function formatToday() {
+  const d = new Date();
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(
+    d.getDate()
+  ).padStart(2, "0")}`;
 }
 
 function StatCard({ value, label }: { value: string; label: string }) {

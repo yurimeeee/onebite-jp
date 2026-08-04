@@ -1,23 +1,15 @@
-import { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  TextInput,
-  ScrollView,
-  ActivityIndicator,
-  Alert,
-} from "react-native";
-import { useRouter } from "expo-router";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { colors } from "@/constants/theme";
-import { PillButton } from "@/components/PillButton";
-import { useAuthStore } from "@/store/authStore";
+import { useEffect, useState } from 'react';
+import { View, Text, Pressable, TextInput, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { colors } from '@/constants/theme';
+import { PillButton } from '@/components/PillButton';
+import { useAuthStore } from '@/store/authStore';
 
-const SAVED_EMAIL_KEY = "saved_email";
-const REMEMBER_EMAIL_KEY = "remember_email";
+const SAVED_EMAIL_KEY = 'saved_email';
+const REMEMBER_EMAIL_KEY = 'remember_email';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -25,8 +17,8 @@ export default function LoginScreen() {
   const login = useAuthStore((s) => s.login);
   const googleLogin = useAuthStore((s) => s.googleLogin);
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberEmail, setRememberEmail] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -36,7 +28,7 @@ export default function LoginScreen() {
     (async () => {
       try {
         const remember = await AsyncStorage.getItem(REMEMBER_EMAIL_KEY);
-        if (remember === "true") {
+        if (remember === 'true') {
           setRememberEmail(true);
           const saved = await AsyncStorage.getItem(SAVED_EMAIL_KEY);
           if (saved) setEmail(saved);
@@ -49,7 +41,7 @@ export default function LoginScreen() {
     try {
       if (rememberEmail) {
         await AsyncStorage.setItem(SAVED_EMAIL_KEY, emailToSave);
-        await AsyncStorage.setItem(REMEMBER_EMAIL_KEY, "true");
+        await AsyncStorage.setItem(REMEMBER_EMAIL_KEY, 'true');
       } else {
         await AsyncStorage.removeItem(SAVED_EMAIL_KEY);
         await AsyncStorage.removeItem(REMEMBER_EMAIL_KEY);
@@ -59,7 +51,7 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert("오류", "이메일과 비밀번호를 입력해주세요.");
+      Alert.alert('오류', '이메일과 비밀번호를 입력해주세요.');
       return;
     }
     setLoading(true);
@@ -67,7 +59,7 @@ export default function LoginScreen() {
       await saveEmailPreference(email);
       await login(email, password);
     } catch (error: any) {
-      Alert.alert("로그인 실패", error.message ?? "다시 시도해주세요.");
+      Alert.alert('로그인 실패', error.message ?? '다시 시도해주세요.');
     } finally {
       setLoading(false);
     }
@@ -78,7 +70,7 @@ export default function LoginScreen() {
     try {
       await googleLogin();
     } catch (error: any) {
-      Alert.alert("Google 로그인 실패", error.message ?? "다시 시도해주세요.");
+      Alert.alert('Google 로그인 실패', error.message ?? '다시 시도해주세요.');
     } finally {
       setGoogleLoading(false);
     }
@@ -98,19 +90,17 @@ export default function LoginScreen() {
     >
       {/* 히어로 */}
       <View className="items-center py-6">
-        <View className="h-16 w-16 items-center justify-center rounded-card bg-pastel-lime">
+        <View className="items-center justify-center w-16 h-16 rounded-card bg-pastel-lime">
           <Ionicons name="restaurant" size={30} color={colors.textPrimary} />
         </View>
         <Text className="mt-4 text-3xl font-bold text-text-primary">원바이트</Text>
-        <Text className="mt-2 text-center text-sm leading-5 text-text-secondary">
-          하루 한 입, 부담 없이 씹어 먹는{"\n"}일본어 단어 학습
-        </Text>
+        <Text className="mt-2 text-sm leading-5 text-center text-text-secondary">매일 1분, 부담 없이 시작하는 하루 습관</Text>
       </View>
 
       {/* 로그인 폼 */}
-      <View className="mt-4 gap-3">
+      <View className="gap-3 mt-4">
         <TextInput
-          className="rounded-2xl px-5 py-4 text-base text-text-primary"
+          className="px-5 py-4 text-base rounded-2xl text-text-primary"
           style={{ backgroundColor: colors.surface2 }}
           placeholder="이메일"
           placeholderTextColor={colors.textSecondary}
@@ -120,7 +110,7 @@ export default function LoginScreen() {
           keyboardType="email-address"
         />
 
-        <View className="flex-row items-center rounded-2xl px-5" style={{ backgroundColor: "#F6F6F6" }}>
+        <View className="flex-row items-center px-5 rounded-2xl" style={{ backgroundColor: '#F6F6F6' }}>
           <TextInput
             className="flex-1 py-4 text-base text-text-primary"
             placeholder="비밀번호"
@@ -130,29 +120,20 @@ export default function LoginScreen() {
             secureTextEntry={!showPassword}
           />
           <Pressable onPress={() => setShowPassword((v) => !v)} hitSlop={8}>
-            <Ionicons
-              name={showPassword ? "eye-off-outline" : "eye-outline"}
-              size={20}
-              color={colors.textSecondary}
-            />
+            <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color={colors.textSecondary} />
           </Pressable>
         </View>
 
-        <Pressable
-          className="flex-row items-center gap-2 py-1"
-          onPress={() => setRememberEmail((v) => !v)}
-        >
+        <Pressable className="flex-row items-center gap-2 py-1" onPress={() => setRememberEmail((v) => !v)}>
           <View
-            className="h-5 w-5 items-center justify-center rounded-md"
+            className="items-center justify-center w-5 h-5 rounded-md"
             style={{
-              backgroundColor: rememberEmail ? colors.primary : "#F6F6F6",
+              backgroundColor: rememberEmail ? colors.primary : '#F6F6F6',
               borderWidth: rememberEmail ? 0 : 1,
               borderColor: colors.border,
             }}
           >
-            {rememberEmail ? (
-              <Ionicons name="checkmark" size={14} color={colors.surface} />
-            ) : null}
+            {rememberEmail ? <Ionicons name="checkmark" size={14} color={colors.surface} /> : null}
           </View>
           <Text className="text-sm text-text-secondary">이메일 저장</Text>
         </Pressable>
@@ -161,13 +142,13 @@ export default function LoginScreen() {
           label="로그인"
           onPress={handleLogin}
           loading={loading}
-          icon="arrow-forward"
+          // icon="arrow-forward"
         />
 
-        <View className="my-1 flex-row items-center gap-3">
-          <View className="h-px flex-1" style={{ backgroundColor: colors.border }} />
+        <View className="flex-row items-center gap-3 my-1">
+          <View className="flex-1 h-px" style={{ backgroundColor: colors.border }} />
           <Text className="text-xs text-text-secondary">또는</Text>
-          <View className="h-px flex-1" style={{ backgroundColor: colors.border }} />
+          <View className="flex-1 h-px" style={{ backgroundColor: colors.border }} />
         </View>
 
         <Pressable
@@ -180,16 +161,14 @@ export default function LoginScreen() {
           ) : (
             <>
               <Ionicons name="logo-google" size={20} color="#EA4335" />
-              <Text className="text-base font-bold text-text-primary">
-                Google로 계속하기
-              </Text>
+              <Text className="text-base font-bold text-text-primary">Google로 계속하기</Text>
             </>
           )}
         </Pressable>
 
-        <View className="mt-2 flex-row justify-center gap-1">
+        <View className="flex-row justify-center gap-1 mt-2">
           <Text className="text-sm text-text-secondary">계정이 없으신가요?</Text>
-          <Pressable onPress={() => router.push("/signup")}>
+          <Pressable onPress={() => router.push('/signup')}>
             <Text className="text-sm font-bold text-primary">회원가입</Text>
           </Pressable>
         </View>

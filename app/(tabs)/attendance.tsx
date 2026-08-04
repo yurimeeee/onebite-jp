@@ -14,6 +14,8 @@ import {
 } from "@/services/quiz";
 import { checkAchievements } from "@/services/achievements";
 import { BadgeUnlockOverlay } from "@/components/BadgeUnlockOverlay";
+import { PillButton } from "@/components/PillButton";
+import { ShareCardModal } from "@/components/ShareCardModal";
 import type { Badge } from "@/constants/achievements";
 
 const WEEK = ["일", "월", "화", "수", "목", "금", "토"];
@@ -53,6 +55,7 @@ export default function AttendanceScreen() {
   const [viewYear, setViewYear] = useState(today.getFullYear());
   const [viewMonth, setViewMonth] = useState(today.getMonth());
   const [newBadges, setNewBadges] = useState<Badge[]>([]);
+  const [shareVisible, setShareVisible] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -192,6 +195,17 @@ export default function AttendanceScreen() {
             </>
           )}
         </Pressable>
+
+        {streak > 0 ? (
+          <View className="mt-3 w-full">
+            <PillButton
+              label="오늘 기록 공유하기"
+              variant="ghost"
+              icon="share-outline"
+              onPress={() => setShareVisible(true)}
+            />
+          </View>
+        ) : null}
       </View>
 
       {/* 캘린더 */}
@@ -268,6 +282,19 @@ export default function AttendanceScreen() {
       </View>
 
       <BadgeUnlockOverlay badges={newBadges} onClose={() => setNewBadges([])} />
+
+      <ShareCardModal
+        visible={shareVisible}
+        onClose={() => setShareVisible(false)}
+        nickname={user?.displayName || user?.email?.split("@")[0] || "학습자"}
+        headline={`${streak}일 연속 학습 중!`}
+        stats={[
+          { label: "연속 출석", value: `${streak}일` },
+          { label: "오늘 날짜", value: todayKey.replaceAll("-", ".") },
+        ]}
+        dateLabel={todayKey.replaceAll("-", ".")}
+        fileName="onebite-attendance"
+      />
     </ScrollView>
   );
 }

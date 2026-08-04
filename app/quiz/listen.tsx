@@ -14,6 +14,7 @@ import { SPEECH_RATES, useSettingsStore, type SpeechRate } from "@/store/setting
 import { useWrongAnswerStore } from "@/store/wrongAnswerStore";
 import { getWordsForDay, markDayCompleted } from "@/services/quiz";
 import { checkAchievements } from "@/services/achievements";
+import { awardWeeklyXP } from "@/services/leaderboard";
 import type { Word } from "@/types/quiz";
 import { shuffle } from "@/utils/shuffle";
 
@@ -101,6 +102,11 @@ export default function ListenQuizScreen() {
         try {
           await markDayCompleted(user.uid, levelKey, dayNumber, correctCount, total);
         } catch {}
+        if (correctCount > 0) {
+          try {
+            await awardWeeklyXP(user.uid, correctCount * 10);
+          } catch {}
+        }
         newBadgeIds = (await checkAchievements(user.uid)).map((b) => b.id);
       }
       const badgeParam = newBadgeIds.length > 0 ? `&newBadges=${newBadgeIds.join(",")}` : "";

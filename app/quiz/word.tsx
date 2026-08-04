@@ -15,6 +15,7 @@ import { useWrongAnswerStore } from "@/store/wrongAnswerStore";
 import { useSavedWordsStore } from "@/store/savedWordsStore";
 import { getWordsForDay, markDayCompleted } from "@/services/quiz";
 import { checkAchievements } from "@/services/achievements";
+import { awardWeeklyXP } from "@/services/leaderboard";
 import type { Word } from "@/types/quiz";
 import { shuffle } from "@/utils/shuffle";
 
@@ -100,6 +101,11 @@ export default function WordQuizScreen() {
         try {
           await markDayCompleted(user.uid, levelKey, dayNumber, correctCount, total);
         } catch {}
+        if (correctCount > 0) {
+          try {
+            await awardWeeklyXP(user.uid, correctCount * 10);
+          } catch {}
+        }
         newBadgeIds = (await checkAchievements(user.uid)).map((b) => b.id);
       }
       const badgeParam = newBadgeIds.length > 0 ? `&newBadges=${newBadgeIds.join(",")}` : "";

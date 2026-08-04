@@ -14,7 +14,10 @@ import {
   getUserHistoryMap,
 } from "@/services/quiz";
 import { checkAchievements } from "@/services/achievements";
+import { getUserProfile } from "@/services/profile";
 import { BadgeUnlockOverlay } from "@/components/BadgeUnlockOverlay";
+import { PillButton } from "@/components/PillButton";
+import { ShareCardModal } from "@/components/ShareCardModal";
 import type { Badge } from "@/constants/achievements";
 import type { UserLastStudyInfo } from "@/types/user";
 
@@ -47,7 +50,9 @@ export default function MyPageScreen() {
   const [completedDays, setCompletedDays] = useState(0);
   const [accuracy, setAccuracy] = useState<number | null>(null);
   const [streak, setStreak] = useState(0);
+  const [nickname, setNickname] = useState<string | null>(null);
   const [newBadges, setNewBadges] = useState<Badge[]>([]);
+  const [shareVisible, setShareVisible] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -59,12 +64,14 @@ export default function MyPageScreen() {
         }
         setLoading(true);
         try {
-          const [history, last, attendance] = await Promise.all([
+          const [history, last, attendance, profile] = await Promise.all([
             getUserHistoryMap(user.uid),
             getLastStudy(user.uid),
             getAttendance(user.uid),
+            getUserProfile(user.uid),
           ]);
           if (cancelled) return;
+          setNickname(profile.nickname);
           const entries = Object.values(history).filter((h) => h.completed);
           setCompletedDays(entries.length);
           const scored = entries.filter(
@@ -94,17 +101,26 @@ export default function MyPageScreen() {
   );
 
   const displayName =
-    user?.displayName || user?.email?.split("@")[0] || "학습자";
+    nickname || user?.displayName || user?.email?.split("@")[0] || "학습자";
   const levelInfo = levels.find((l) => l.key === lastStudy?.last_study_level);
   const levelLabel = levelInfo ? `${levelInfo.label} (JLPT ${levelInfo.jlpt})` : undefined;
 
   const menu: {
     icon: keyof typeof Ionicons.glyphMap;
     label: string;
-    href?: "/settings" | "/notifications" | "/quiz/review" | "/quiz/saved" | "/achievements";
+    href?:
+      | "/settings"
+      | "/notifications"
+      | "/quiz/review"
+      | "/quiz/saved"
+      | "/achievements"
+      | "/leaderboard"
+      | "/goal";
     badge?: number;
   }[] = [
     { icon: "trophy-outline", label: "업적", href: "/achievements" },
+    { icon: "podium-outline", label: "주간 랭킹", href: "/leaderboard" },
+    { icon: "flag-outline", label: "학습 목표 변경", href: "/goal" },
     { icon: "repeat-outline", label: "오답노트", href: "/quiz/review", badge: wrongCount },
     { icon: "notifications-outline", label: "알림 설정", href: "/notifications" },
     { icon: "bookmark-outline", label: "저장한 단어", href: "/quiz/saved", badge: savedCount },
@@ -190,6 +206,16 @@ export default function MyPageScreen() {
               bg={colors.pastelLimeLight}
             />
           </View>
+
+          {/* 학습 카드 공유 */}
+          <View className="mt-4">
+            <PillButton
+              label="학습 카드 공유하기"
+              variant="secondary"
+              icon="share-outline"
+              onPress={() => setShareVisible(true)}
+            />
+          </View>
         </>
       )}
 
@@ -239,8 +265,29 @@ export default function MyPageScreen() {
       </Pressable>
 
       <BadgeUnlockOverlay badges={newBadges} onClose={() => setNewBadges([])} />
+
+      <ShareCardModal
+        visible={shareVisible}
+        onClose={() => setShareVisible(false)}
+        nickname={displayName}
+        headline={streak > 0 ? `${streak}일 연속 학습 중!` : "학습을 시작했어요"}
+        stats={[
+          { label: "완료 Day", value: `${completedDays}` },
+          { label: "연속 출석", value: `${streak}일` },
+          { label: "정답률", value: accuracy != null ? `${accuracy}%` : "-" },
+        ]}
+        dateLabel={formatToday()}
+        fileName="onebite-mypage"
+      />
     </ScrollView>
   );
+}
+
+function formatToday() {
+  const d = new Date();
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(
+    d.getDate()
+  ).padStart(2, "0")}`;
 }
 
 function StatCard({
