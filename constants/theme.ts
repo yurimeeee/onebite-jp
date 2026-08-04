@@ -1,6 +1,7 @@
 export const colors = {
   primary: "#6573F0",
   primarySoft: "#7D85FA",
+  primaryLight: "#EBEDFE",
   textPrimary: "#181D2F",
   textSecondary: "#999CA3",
   background: "#F8F8F8",
@@ -28,11 +29,12 @@ export type LevelKey = "beginner" | "elementary" | "intermediate" | "advanced";
 export const levels: {
   key: LevelKey;
   label: string;
+  jlpt: string;
   bg: string;
   chip: string;
 }[] = [
-  { key: "beginner", label: "입문", bg: colors.pastelLimeLight, chip: colors.pastelLime },
-  { key: "elementary", label: "초급", bg: colors.pastelCyanLight, chip: colors.pastelCyan },
-  { key: "intermediate", label: "중급", bg: colors.pastelAmberLight, chip: colors.pastelAmber },
-  { key: "advanced", label: "고급", bg: colors.pastelPinkLight, chip: colors.pastelPink },
+  { key: "beginner", label: "입문", jlpt: "N5", bg: colors.pastelLimeLight, chip: colors.pastelLime },
+  { key: "elementary", label: "초급", jlpt: "N4", bg: colors.pastelCyanLight, chip: colors.pastelCyan },
+  { key: "intermediate", label: "중급", jlpt: "N3", bg: colors.pastelAmberLight, chip: colors.pastelAmber },
+  { key: "advanced", label: "고급", jlpt: "N2", bg: colors.pastelPinkLight, chip: colors.pastelPink },
 ];

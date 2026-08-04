@@ -60,6 +60,8 @@ export default function WordQuizScreen() {
   }, [q, words]);
 
   const soundEnabled = useSettingsStore((s) => s.soundEnabled);
+  const furiganaEnabled = useSettingsStore((s) => s.furiganaEnabled);
+  const speechRate = useSettingsStore((s) => s.speechRate);
   const addWrong = useWrongAnswerStore((s) => s.addWrong);
   const removeWrong = useWrongAnswerStore((s) => s.removeWrong);
   const isSaved = useSavedWordsStore((s) => (q ? s.isSaved(q.wordId) : false));
@@ -67,7 +69,7 @@ export default function WordQuizScreen() {
 
   const speak = () => {
     if (!q || !soundEnabled) return;
-    Speech.speak(q.jp, { language: "ja-JP", rate: 0.9 });
+    Speech.speak(q.jp, { language: "ja-JP", rate: speechRate });
   };
 
   const onSelect = (choice: string) => {
@@ -155,7 +157,9 @@ export default function WordQuizScreen() {
         }}
       >
         <Text className="text-6xl font-bold text-text-primary">{q.jp}</Text>
-        <Text className="mt-3 text-xl text-text-secondary">{q.kana}</Text>
+        {furiganaEnabled ? (
+          <Text className="mt-3 text-xl text-text-secondary">{q.kana}</Text>
+        ) : null}
         <View className="mt-6 flex-row gap-3">
           <Pressable
             onPress={speak}

@@ -24,6 +24,8 @@ export default function ReviewQuizScreen() {
   const addWrong = useWrongAnswerStore((s) => s.addWrong);
   const removeWrong = useWrongAnswerStore((s) => s.removeWrong);
   const soundEnabled = useSettingsStore((s) => s.soundEnabled);
+  const furiganaEnabled = useSettingsStore((s) => s.furiganaEnabled);
+  const speechRate = useSettingsStore((s) => s.speechRate);
 
   const [phase, setPhase] = useState<Phase>("intro");
   const [session, setSession] = useState<WrongAnswerItem[] | null>(null);
@@ -59,7 +61,7 @@ export default function ReviewQuizScreen() {
 
   const speak = () => {
     if (!q?.word || !soundEnabled) return;
-    Speech.speak(q.word.jp, { language: "ja-JP", rate: 0.9 });
+    Speech.speak(q.word.jp, { language: "ja-JP", rate: speechRate });
   };
 
   const onSelectWord = (choice: string) => {
@@ -201,7 +203,9 @@ export default function ReviewQuizScreen() {
           }}
         >
           <Text className="text-6xl font-bold text-text-primary">{word.jp}</Text>
-          <Text className="mt-3 text-xl text-text-secondary">{word.kana}</Text>
+          {furiganaEnabled ? (
+            <Text className="mt-3 text-xl text-text-secondary">{word.kana}</Text>
+          ) : null}
           <Pressable
             onPress={speak}
             className="mt-6 h-12 w-12 items-center justify-center rounded-pill active:scale-95"

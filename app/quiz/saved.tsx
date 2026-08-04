@@ -13,10 +13,12 @@ export default function SavedWordsScreen() {
   const items = useSavedWordsStore((s) => s.items);
   const removeSaved = useSavedWordsStore((s) => s.removeSaved);
   const soundEnabled = useSettingsStore((s) => s.soundEnabled);
+  const furiganaEnabled = useSettingsStore((s) => s.furiganaEnabled);
+  const speechRate = useSettingsStore((s) => s.speechRate);
 
   const speak = (jp: string) => {
     if (!soundEnabled) return;
-    Speech.speak(jp, { language: "ja-JP", rate: 0.9 });
+    Speech.speak(jp, { language: "ja-JP", rate: speechRate });
   };
 
   return (
@@ -55,7 +57,9 @@ export default function SavedWordsScreen() {
               <View className="flex-1 pr-3">
                 <View className="flex-row items-baseline gap-2">
                   <Text className="text-xl font-bold text-text-primary">{item.word.jp}</Text>
-                  <Text className="text-sm text-text-secondary">{item.word.kana}</Text>
+                  {furiganaEnabled ? (
+                    <Text className="text-sm text-text-secondary">{item.word.kana}</Text>
+                  ) : null}
                 </View>
                 <Text className="mt-1 text-text-secondary">{item.word.ko}</Text>
               </View>

@@ -48,6 +48,14 @@ export default function LevelSelectScreen() {
             <Text className="mt-2 text-base font-bold text-text-primary">
               {l.label}
             </Text>
+            <View
+              className="mt-1.5 rounded-pill px-2 py-0.5"
+              style={{ backgroundColor: colors.surface }}
+            >
+              <Text className="text-[11px] font-bold" style={{ color: colors.primary }}>
+                JLPT {l.jlpt}
+              </Text>
+            </View>
           </Pressable>
         ))}
       </View>

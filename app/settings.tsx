@@ -3,15 +3,19 @@ import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "@/constants/theme";
-import { useSettingsStore } from "@/store/settingsStore";
+import { SPEECH_RATES, useSettingsStore, type SpeechRate } from "@/store/settingsStore";
 
 export default function SettingsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const soundEnabled = useSettingsStore((s) => s.soundEnabled);
   const vibrationEnabled = useSettingsStore((s) => s.vibrationEnabled);
+  const furiganaEnabled = useSettingsStore((s) => s.furiganaEnabled);
+  const speechRate = useSettingsStore((s) => s.speechRate);
   const toggleSound = useSettingsStore((s) => s.toggleSound);
   const toggleVibration = useSettingsStore((s) => s.toggleVibration);
+  const toggleFurigana = useSettingsStore((s) => s.toggleFurigana);
+  const setSpeechRate = useSettingsStore((s) => s.setSpeechRate);
 
   return (
     <ScrollView
@@ -49,8 +53,58 @@ export default function SettingsScreen() {
           onChange={toggleVibration}
           border
         />
+        <SettingRow
+          icon="text-outline"
+          bg={colors.pastelLimeLight}
+          label="후리가나 표시"
+          description="한자 위에 읽는 법(가나)을 함께 보여줘요"
+          value={furiganaEnabled}
+          onChange={toggleFurigana}
+          border
+        />
+      </View>
+
+      <Text className="mb-3 mt-6 text-sm font-bold text-text-secondary">음성 재생 속도</Text>
+      <View className="flex-row gap-2">
+        {SPEECH_RATES.map((rate) => (
+          <SpeedOption
+            key={rate}
+            rate={rate}
+            selected={speechRate === rate}
+            onPress={() => setSpeechRate(rate)}
+          />
+        ))}
       </View>
     </ScrollView>
+  );
+}
+
+function SpeedOption({
+  rate,
+  selected,
+  onPress,
+}: {
+  rate: SpeechRate;
+  selected: boolean;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      className="flex-1 items-center rounded-card py-3 active:scale-[0.98]"
+      style={{
+        backgroundColor: selected ? colors.primary : colors.surface,
+        borderWidth: 1,
+        borderColor: selected ? colors.primary : colors.border,
+      }}
+    >
+      <Text
+        className="text-base font-bold"
+        style={{ color: selected ? colors.surface : colors.textPrimary }}
+      >
+        {rate.toFixed(1)}x
+      </Text>
+    </Pressable>
   );
 }
 

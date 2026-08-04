@@ -80,7 +80,7 @@ export default function DaySelectScreen() {
       showsVerticalScrollIndicator={false}
     >
       <ScreenHeader
-        subtitle={`${MODE_LABEL[modeKey]} · ${levelInfo.label}`}
+        subtitle={`${MODE_LABEL[modeKey]} · ${levelInfo.label} (JLPT ${levelInfo.jlpt})`}
         title="Day를 선택하세요"
       />
 

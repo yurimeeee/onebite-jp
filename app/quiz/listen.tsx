@@ -10,14 +10,11 @@ import { QuizHeader } from "@/components/QuizHeader";
 import { ChoiceButton } from "@/components/ChoiceButton";
 import { PillButton } from "@/components/PillButton";
 import { useAuthStore } from "@/store/authStore";
+import { SPEECH_RATES, useSettingsStore, type SpeechRate } from "@/store/settingsStore";
 import { useWrongAnswerStore } from "@/store/wrongAnswerStore";
 import { getWordsForDay, markDayCompleted } from "@/services/quiz";
 import type { Word } from "@/types/quiz";
 import { shuffle } from "@/utils/shuffle";
-
-function speak(word: Word) {
-  Speech.speak(word.jp, { language: "ja-JP", rate: 0.9 });
-}
 
 export default function ListenQuizScreen() {
   const router = useRouter();
@@ -26,6 +23,13 @@ export default function ListenQuizScreen() {
   const { level, day } = useLocalSearchParams<{ level: string; day: string }>();
   const levelKey = level as LevelKey;
   const dayNumber = Number(day);
+  const furiganaEnabled = useSettingsStore((s) => s.furiganaEnabled);
+  const speechRate = useSettingsStore((s) => s.speechRate);
+  const setSpeechRate = useSettingsStore((s) => s.setSpeechRate);
+
+  const speak = (word: Word) => {
+    Speech.speak(word.jp, { language: "ja-JP", rate: speechRate });
+  };
 
   const [words, setWords] = useState<Word[] | null>(null);
   const [error, setError] = useState(false);
@@ -164,10 +168,23 @@ export default function ListenQuizScreen() {
           다시 들으려면 눌러주세요
         </Text>
 
+        <View className="mt-4 flex-row gap-2">
+          {SPEECH_RATES.map((rate) => (
+            <SpeedChip
+              key={rate}
+              rate={rate}
+              selected={speechRate === rate}
+              onPress={() => setSpeechRate(rate)}
+            />
+          ))}
+        </View>
+
         {revealed ? (
           <Animated.View entering={FadeIn.duration(200)} style={{ alignItems: "center" }}>
             <Text className="mt-5 text-4xl font-bold text-text-primary">{q.jp}</Text>
-            <Text className="mt-2 text-lg text-text-secondary">{q.kana}</Text>
+            {furiganaEnabled ? (
+              <Text className="mt-2 text-lg text-text-secondary">{q.kana}</Text>
+            ) : null}
           </Animated.View>
         ) : null}
       </Animated.View>
@@ -201,5 +218,32 @@ export default function ListenQuizScreen() {
         ) : null}
       </View>
     </View>
+  );
+}
+
+function SpeedChip({
+  rate,
+  selected,
+  onPress,
+}: {
+  rate: SpeechRate;
+  selected: boolean;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      className="items-center justify-center rounded-pill px-3 py-1.5 active:scale-95"
+      style={{
+        backgroundColor: selected ? colors.primary : colors.surface2,
+      }}
+    >
+      <Text
+        className="text-xs font-bold"
+        style={{ color: selected ? colors.surface : colors.textSecondary }}
+      >
+        {rate.toFixed(1)}x
+      </Text>
+    </Pressable>
   );
 }

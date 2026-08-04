@@ -88,7 +88,8 @@ export default function MyPageScreen() {
 
   const displayName =
     user?.displayName || user?.email?.split("@")[0] || "학습자";
-  const levelLabel = levels.find((l) => l.key === lastStudy?.last_study_level)?.label;
+  const levelInfo = levels.find((l) => l.key === lastStudy?.last_study_level);
+  const levelLabel = levelInfo ? `${levelInfo.label} (JLPT ${levelInfo.jlpt})` : undefined;
 
   const menu: {
     icon: keyof typeof Ionicons.glyphMap;
