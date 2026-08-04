@@ -37,7 +37,8 @@ export default function ReviewQuizScreen() {
   const q = session?.[index];
   const revealed = selected !== null;
 
-  const isWordLike = q?.mode === "word" || q?.mode === "listen";
+  const isWordLike =
+    q?.mode === "word" || q?.mode === "listen" || q?.mode === "timeattack";
 
   const wordChoices = useMemo(() => {
     if (!q || !isWordLike || !q.word) return [];

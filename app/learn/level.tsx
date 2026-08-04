@@ -8,18 +8,33 @@ const MODE_LABEL: Record<string, string> = {
   word: "단어 퀴즈",
   blank: "빈칸 채우기",
   listen: "리스닝 퀴즈",
+  swipe: "뇌 빼고 단어 넘기기",
+  radio: "출퇴근 라디오",
+  timeattack: "5초 타임어택",
 };
 
 export default function LevelSelectScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { mode } = useLocalSearchParams<{ mode: string }>();
-  const modeKey = mode === "blank" ? "blank" : mode === "listen" ? "listen" : "word";
+  const modeKey = mode && mode in MODE_LABEL ? mode : "word";
 
+  // 빈칸 채우기·서브 학습 모드는 일차 구분이 없어 레벨 선택 후 바로 진입한다.
   const selectLevel = (level: LevelKey) => {
     if (modeKey === "blank") {
-      // 빈칸 채우기는 일차 구분이 없어 레벨 선택 후 바로 퀴즈로 진입
       router.push(`/quiz/blank?level=${level}`);
+      return;
+    }
+    if (modeKey === "swipe") {
+      router.push(`/modes/swipe?level=${level}`);
+      return;
+    }
+    if (modeKey === "radio") {
+      router.push(`/modes/radio?level=${level}`);
+      return;
+    }
+    if (modeKey === "timeattack") {
+      router.push(`/modes/timeattack?level=${level}`);
       return;
     }
     router.push(`/learn/day?mode=${modeKey}&level=${level}`);

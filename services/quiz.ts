@@ -49,6 +49,18 @@ export async function getWordsForDay(
   );
 }
 
+export async function getAllWordsForLevel(level: Levels): Promise<Word[]> {
+  return getCachedPersistent(
+    `allWords:${level}`,
+    async () => {
+      const days = await getDaysForLevel(level);
+      const lists = await Promise.all(days.map((day) => getWordsForDay(level, day)));
+      return lists.flat();
+    },
+    CONTENT_TTL
+  );
+}
+
 export async function getFillInBlankQuizzes(
   level: Levels
 ): Promise<FillInBlankQuiz[]> {

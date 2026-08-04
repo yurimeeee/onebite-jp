@@ -102,6 +102,9 @@ export default function RootLayout() {
               <Stack.Screen name="quiz/listen" />
               <Stack.Screen name="quiz/review" />
               <Stack.Screen name="quiz/saved" />
+              <Stack.Screen name="modes/swipe" />
+              <Stack.Screen name="modes/radio" />
+              <Stack.Screen name="modes/timeattack" />
               <Stack.Screen
                 name="quiz/result"
                 options={{ animation: "fade", gestureEnabled: false }}

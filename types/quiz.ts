@@ -25,7 +25,7 @@ export interface FillInBlankQuiz {
   hint: string;
 }
 
-export type WrongAnswerMode = "word" | "blank" | "listen";
+export type WrongAnswerMode = "word" | "blank" | "listen" | "timeattack";
 
 export interface WrongAnswerItem {
   id: string;

@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "@/constants/theme";
 
-type Mode = "word" | "blank" | "listen";
+type Mode = "word" | "blank" | "listen" | "swipe" | "radio" | "timeattack";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -50,6 +50,37 @@ export default function HomeScreen() {
           minutes={4}
           icon="headset"
           bg={colors.pastelPinkLight}
+        />
+      </View>
+
+      {/* 서브 학습 모드 */}
+      <Text className="mb-3 mt-8 text-base font-bold text-text-primary">
+        서브 학습 모드
+      </Text>
+      <View className="gap-4">
+        <ModeCard
+          onPress={() => selectMode("swipe")}
+          title="👀 뇌 빼고 단어 넘기기"
+          desc="숏폼처럼 스와이프로 빠르게 훑어보기"
+          minutes={2}
+          icon="albums-outline"
+          bg={colors.pastelLimeLight}
+        />
+        <ModeCard
+          onPress={() => selectMode("radio")}
+          title="🎧 출퇴근 라디오"
+          desc="화면 없이 듣기만 해도 되는 오디오 학습"
+          minutes={10}
+          icon="radio-outline"
+          bg={colors.pastelCyanLight}
+        />
+        <ModeCard
+          onPress={() => selectMode("timeattack")}
+          title="⏱️ 5초 타임어택"
+          desc="제한시간 안에 스피드로 맞히기"
+          minutes={2}
+          icon="flash-outline"
+          bg={colors.pastelAmberLight}
         />
       </View>
     </ScrollView>
