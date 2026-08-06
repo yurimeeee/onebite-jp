@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 import { View, Text } from "react-native";
-import { colors } from "@/constants/theme";
+import { shareCardThemes, type ShareCardTheme } from "@/constants/shareCardThemes";
 
 export type ShareCardStat = { label: string; value: string };
 
@@ -9,11 +9,12 @@ type Props = {
   headline: string;
   stats: ShareCardStat[];
   dateLabel: string;
+  theme?: ShareCardTheme;
 };
 
 /** 9:16 비율의 학습 인증 카드. captureAndShare가 이 뷰를 그대로 이미지로 캡처한다. */
 export const ShareCard = forwardRef<View, Props>(function ShareCard(
-  { nickname, headline, stats, dateLabel },
+  { nickname, headline, stats, dateLabel, theme = shareCardThemes[0] },
   ref
 ) {
   return (
@@ -24,7 +25,7 @@ export const ShareCard = forwardRef<View, Props>(function ShareCard(
         width: 320,
         height: 560,
         borderRadius: 32,
-        backgroundColor: colors.pastelPinkLight,
+        backgroundColor: theme.cardBg,
         padding: 28,
         justifyContent: "space-between",
         overflow: "hidden",
@@ -38,7 +39,7 @@ export const ShareCard = forwardRef<View, Props>(function ShareCard(
           width: 140,
           height: 140,
           borderRadius: 70,
-          backgroundColor: colors.pastelCyan,
+          backgroundColor: theme.blob1,
           opacity: 0.55,
         }}
       />
@@ -50,13 +51,13 @@ export const ShareCard = forwardRef<View, Props>(function ShareCard(
           width: 120,
           height: 120,
           borderRadius: 60,
-          backgroundColor: colors.pastelAmber,
+          backgroundColor: theme.blob2,
           opacity: 0.5,
         }}
       />
 
       <View>
-        <Text style={{ fontSize: 14, fontWeight: "800", color: colors.primary }}>
+        <Text style={{ fontSize: 14, fontWeight: "800", color: theme.accent }}>
           원바이트 ONE BITE
         </Text>
         <Text
@@ -64,7 +65,7 @@ export const ShareCard = forwardRef<View, Props>(function ShareCard(
             marginTop: 18,
             fontSize: 15,
             fontWeight: "700",
-            color: colors.textSecondary,
+            color: theme.textSecondary,
           }}
         >
           {nickname}님
@@ -74,7 +75,7 @@ export const ShareCard = forwardRef<View, Props>(function ShareCard(
             marginTop: 6,
             fontSize: 26,
             fontWeight: "800",
-            color: colors.textPrimary,
+            color: theme.textPrimary,
             lineHeight: 34,
           }}
         >
@@ -91,15 +92,15 @@ export const ShareCard = forwardRef<View, Props>(function ShareCard(
               alignItems: "center",
               justifyContent: "space-between",
               borderRadius: 18,
-              backgroundColor: "rgba(255,255,255,0.72)",
+              backgroundColor: theme.statBg,
               paddingVertical: 14,
               paddingHorizontal: 18,
             }}
           >
-            <Text style={{ fontSize: 14, fontWeight: "600", color: colors.textSecondary }}>
+            <Text style={{ fontSize: 14, fontWeight: "600", color: theme.textSecondary }}>
               {s.label}
             </Text>
-            <Text style={{ fontSize: 20, fontWeight: "800", color: colors.textPrimary }}>
+            <Text style={{ fontSize: 20, fontWeight: "800", color: theme.textPrimary }}>
               {s.value}
             </Text>
           </View>
@@ -110,7 +111,7 @@ export const ShareCard = forwardRef<View, Props>(function ShareCard(
         style={{
           fontSize: 12,
           fontWeight: "600",
-          color: colors.textSecondary,
+          color: theme.textSecondary,
           textAlign: "right",
         }}
       >

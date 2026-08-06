@@ -1,8 +1,11 @@
 import { useRef, useState } from "react";
-import { Modal, View, Alert } from "react-native";
+import { Modal, View, Text, Pressable, Alert } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { PillButton } from "@/components/PillButton";
 import { ShareCard, type ShareCardStat } from "@/components/ShareCard";
 import { captureAndShare } from "@/utils/shareCapture";
+import { shareCardThemes } from "@/constants/shareCardThemes";
+import { colors } from "@/constants/theme";
 
 type Props = {
   visible: boolean;
@@ -25,8 +28,11 @@ export function ShareCardModal({
 }: Props) {
   const cardRef = useRef<View>(null);
   const [sharing, setSharing] = useState(false);
+  const [themeIndex, setThemeIndex] = useState(0);
 
   if (!visible) return null;
+
+  const theme = shareCardThemes[themeIndex];
 
   const handleShare = async () => {
     setSharing(true);
@@ -51,7 +57,40 @@ export function ShareCardModal({
           headline={headline}
           stats={stats}
           dateLabel={dateLabel}
+          theme={theme}
         />
+
+        <View className="mt-5 flex-row gap-3">
+          {shareCardThemes.map((t, index) => {
+            const isSelected = index === themeIndex;
+            return (
+              <Pressable
+                key={t.key}
+                onPress={() => setThemeIndex(index)}
+                hitSlop={8}
+                className="items-center justify-center rounded-pill"
+                style={{
+                  width: 34,
+                  height: 34,
+                  backgroundColor: t.swatch,
+                  borderWidth: 2,
+                  borderColor: isSelected ? colors.primary : "rgba(255,255,255,0.6)",
+                }}
+              >
+                {isSelected ? (
+                  <Ionicons
+                    name="checkmark"
+                    size={16}
+                    color={t.key === "night" ? "#FFFFFF" : colors.textPrimary}
+                  />
+                ) : null}
+              </Pressable>
+            );
+          })}
+        </View>
+        <Text className="mt-2 text-xs font-semibold" style={{ color: "rgba(255,255,255,0.75)" }}>
+          {theme.label} 테마
+        </Text>
 
         <View className="mt-6 w-full max-w-sm gap-3">
           <PillButton
