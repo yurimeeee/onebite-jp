@@ -8,6 +8,7 @@ import DateTimePicker, {
 } from "@react-native-community/datetimepicker";
 import { colors } from "@/constants/theme";
 import { useNotificationStore } from "@/store/notificationStore";
+import { safeBack } from "@/utils/navigation";
 
 function formatTime(hour: number, minute: number) {
   const period = hour < 12 ? "오전" : "오후";
@@ -185,7 +186,7 @@ export default function NotificationsScreen() {
       <View className="flex-row items-center gap-3">
         <Pressable
           hitSlop={12}
-          onPress={() => router.back()}
+          onPress={() => safeBack(router)}
           className="h-10 w-10 items-center justify-center rounded-pill bg-surface"
           style={{ borderWidth: 1, borderColor: colors.border }}
         >

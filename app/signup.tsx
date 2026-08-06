@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "@/constants/theme";
 import { PillButton } from "@/components/PillButton";
+import { safeBack } from "@/utils/navigation";
 import { useAuthStore } from "@/store/authStore";
 
 export default function SignupScreen() {
@@ -56,7 +57,7 @@ export default function SignupScreen() {
       showsVerticalScrollIndicator={false}
     >
       <Pressable
-        onPress={() => router.back()}
+        onPress={() => safeBack(router, "/")}
         hitSlop={12}
         className="mb-4 h-10 w-10 items-center justify-center rounded-pill bg-surface"
         style={{ borderWidth: 1, borderColor: colors.border }}
@@ -123,7 +124,7 @@ export default function SignupScreen() {
 
         <View className="mt-2 flex-row justify-center gap-1">
           <Text className="text-sm text-text-secondary">이미 계정이 있으신가요?</Text>
-          <Pressable onPress={() => router.back()}>
+          <Pressable onPress={() => safeBack(router, "/")}>
             <Text className="text-sm font-bold text-primary">로그인</Text>
           </Pressable>
         </View>

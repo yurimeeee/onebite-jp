@@ -8,6 +8,7 @@ import { SPEECH_RATES, useSettingsStore, type SpeechRate } from "@/store/setting
 import { useAuthStore } from "@/store/authStore";
 import { getUserProfile, setNickname as saveNickname } from "@/services/profile";
 import { PillButton } from "@/components/PillButton";
+import { safeBack } from "@/utils/navigation";
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -63,7 +64,7 @@ export default function SettingsScreen() {
       <View className="flex-row items-center gap-3">
         <Pressable
           hitSlop={12}
-          onPress={() => router.back()}
+          onPress={() => safeBack(router)}
           className="h-10 w-10 items-center justify-center rounded-pill bg-surface"
           style={{ borderWidth: 1, borderColor: colors.border }}
         >

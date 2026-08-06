@@ -2,6 +2,7 @@ import { View, Text, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "@/constants/theme";
+import { safeBack } from "@/utils/navigation";
 
 export function ScreenHeader({
   title,
@@ -16,7 +17,7 @@ export function ScreenHeader({
     <View className="flex-row items-center gap-3">
       <Pressable
         hitSlop={12}
-        onPress={() => router.back()}
+        onPress={() => safeBack(router)}
         className="h-10 w-10 items-center justify-center rounded-pill bg-surface active:scale-95"
         style={{ borderWidth: 1, borderColor: colors.border }}
       >

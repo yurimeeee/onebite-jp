@@ -13,6 +13,7 @@ import { getFillInBlankQuizzes } from "@/services/quiz";
 import { awardWeeklyXP } from "@/services/leaderboard";
 import type { FillInBlankQuiz } from "@/types/quiz";
 import { shuffle } from "@/utils/shuffle";
+import { safeBack } from "@/utils/navigation";
 
 export default function BlankQuizScreen() {
   const router = useRouter();
@@ -88,7 +89,7 @@ export default function BlankQuizScreen() {
       <View className="flex-1 items-center justify-center bg-background px-6">
         <Text className="text-text-secondary">문제를 불러오지 못했어요</Text>
         <View className="mt-4">
-          <PillButton label="돌아가기" onPress={() => router.back()} />
+          <PillButton label="돌아가기" onPress={() => safeBack(router)} />
         </View>
       </View>
     );
@@ -117,7 +118,7 @@ export default function BlankQuizScreen() {
         progress={index / total}
         index={index + 1}
         total={total}
-        onClose={() => router.back()}
+        onClose={() => safeBack(router)}
       />
 
       <Text className="mb-3 mt-8 text-base font-semibold text-text-secondary">

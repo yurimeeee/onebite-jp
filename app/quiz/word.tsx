@@ -18,6 +18,7 @@ import { checkAchievements } from "@/services/achievements";
 import { awardWeeklyXP } from "@/services/leaderboard";
 import type { Word } from "@/types/quiz";
 import { shuffle } from "@/utils/shuffle";
+import { safeBack } from "@/utils/navigation";
 
 export default function WordQuizScreen() {
   const router = useRouter();
@@ -123,7 +124,7 @@ export default function WordQuizScreen() {
       <View className="flex-1 items-center justify-center bg-background px-6">
         <Text className="text-text-secondary">단어를 불러오지 못했어요</Text>
         <View className="mt-4">
-          <PillButton label="돌아가기" onPress={() => router.back()} />
+          <PillButton label="돌아가기" onPress={() => safeBack(router)} />
         </View>
       </View>
     );
@@ -146,7 +147,7 @@ export default function WordQuizScreen() {
         progress={index / total}
         index={index + 1}
         total={total}
-        onClose={() => router.back()}
+        onClose={() => safeBack(router)}
       />
 
       {/* 단어 카드 */}

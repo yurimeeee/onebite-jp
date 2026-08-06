@@ -19,6 +19,7 @@ import { useSavedWordsStore } from "@/store/savedWordsStore";
 import { getAllWordsForLevel } from "@/services/quiz";
 import type { Word } from "@/types/quiz";
 import { shuffle } from "@/utils/shuffle";
+import { safeBack } from "@/utils/navigation";
 
 const SWIPE_THRESHOLD = 90;
 
@@ -112,7 +113,7 @@ export default function SwipeModeScreen() {
       <View className="flex-1 items-center justify-center bg-background px-6">
         <Text className="text-text-secondary">단어를 불러오지 못했어요</Text>
         <View className="mt-4">
-          <PillButton label="돌아가기" onPress={() => router.back()} />
+          <PillButton label="돌아가기" onPress={() => safeBack(router)} />
         </View>
       </View>
     );
@@ -132,7 +133,7 @@ export default function SwipeModeScreen() {
       style={{ paddingTop: insets.top + 8, paddingBottom: insets.bottom + 12 }}
     >
       <View className="flex-row items-center justify-between">
-        <Pressable hitSlop={12} onPress={() => router.back()}>
+        <Pressable hitSlop={12} onPress={() => safeBack(router)}>
           <Ionicons name="close" size={28} color={colors.textSecondary} />
         </Pressable>
         <Text className="text-sm font-bold text-text-secondary">

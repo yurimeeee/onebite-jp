@@ -6,6 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { colors } from "@/constants/theme";
 import { DAILY_GOALS, type DailyGoalKey } from "@/constants/goals";
 import { PillButton } from "@/components/PillButton";
+import { safeBack } from "@/utils/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { useGoalStore } from "@/store/goalStore";
 
@@ -28,7 +29,7 @@ export default function GoalScreen() {
     try {
       await setGoal(user.uid, selected);
       if (isChanging) {
-        router.back();
+        safeBack(router);
       } else {
         router.replace("/(tabs)");
       }
@@ -52,7 +53,7 @@ export default function GoalScreen() {
       {isChanging ? (
         <Pressable
           hitSlop={12}
-          onPress={() => router.back()}
+          onPress={() => safeBack(router)}
           className="mb-4 h-10 w-10 items-center justify-center rounded-pill bg-surface"
           style={{ borderWidth: 1, borderColor: colors.border }}
         >

@@ -14,6 +14,7 @@ import { useSettingsStore } from "@/store/settingsStore";
 import { useWrongAnswerStore } from "@/store/wrongAnswerStore";
 import type { WrongAnswerItem } from "@/types/quiz";
 import { shuffle } from "@/utils/shuffle";
+import { safeBack } from "@/utils/navigation";
 
 type Phase = "intro" | "playing" | "done";
 
@@ -184,7 +185,7 @@ export default function ReviewQuizScreen() {
           progress={index / total}
           index={index + 1}
           total={total}
-          onClose={() => router.back()}
+          onClose={() => safeBack(router)}
         />
 
         <Animated.View
@@ -266,7 +267,7 @@ export default function ReviewQuizScreen() {
           progress={index / total}
           index={index + 1}
           total={total}
-          onClose={() => router.back()}
+          onClose={() => safeBack(router)}
         />
 
         <Text className="mb-3 mt-8 text-base font-semibold text-text-secondary">
