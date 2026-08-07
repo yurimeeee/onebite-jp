@@ -69,6 +69,7 @@ export default function RootLayout() {
               <Stack.Protected guard={!authLoading && !user}>
                 <Stack.Screen name="index" />
                 <Stack.Screen name="signup" />
+                <Stack.Screen name="auth/kakao-callback" />
               </Stack.Protected>
 
               {/* goal 화면은 needsGoal 여부와 무관하게 로그인만 하면 항상 접근 가능해야 한다.

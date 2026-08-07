@@ -26,7 +26,22 @@ EXPO_PUBLIC_FIREBASE_PROJECT_ID=
 EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=
 EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
 EXPO_PUBLIC_FIREBASE_APP_ID=
+
+EXPO_PUBLIC_KAKAO_JS_KEY=
+EXPO_PUBLIC_API_BASE_URL=
 ```
+
+카카오 로그인은 Firebase에 내장된 제공자가 아니라 `api/kakao-auth.ts`(Vercel Function)가 카카오 액세스 토큰을 Firebase 커스텀 토큰으로 교환합니다. 이 함수는 Firebase Admin SDK 서비스 계정 키가 필요합니다.
+
+```
+FIREBASE_SERVICE_ACCOUNT_KEY=
+```
+
+- `EXPO_PUBLIC_KAKAO_JS_KEY`: 카카오 개발자센터 앱의 JavaScript 키 (웹 로그인용)
+- `EXPO_PUBLIC_API_BASE_URL`: 네이티브(iOS/Android) 앱이 `/api/kakao-auth`를 호출할 배포 도메인 (예: `https://onebite-jp.vercel.app`). 웹에서는 상대 경로로 호출되므로 비워둬도 됩니다.
+- `FIREBASE_SERVICE_ACCOUNT_KEY`: Firebase 콘솔 > 프로젝트 설정 > 서비스 계정 > "새 비공개 키 생성"으로 받은 JSON을 한 줄 문자열로 저장 (Vercel 프로젝트 환경변수에 등록, 로컬 `.env`에는 넣지 않아도 됨)
+
+`app.json`의 `@react-native-seoul/kakao-login` 플러그인 설정에 카카오 **네이티브 앱 키**(JS 키와 다름)를 채워야 iOS/Android 빌드가 동작합니다.
 
 개발 서버 실행:
 

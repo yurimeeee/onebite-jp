@@ -16,6 +16,7 @@ export default function LoginScreen() {
   const insets = useSafeAreaInsets();
   const login = useAuthStore((s) => s.login);
   const googleLogin = useAuthStore((s) => s.googleLogin);
+  const kakaoLogin = useAuthStore((s) => s.kakaoLogin);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,6 +24,7 @@ export default function LoginScreen() {
   const [rememberEmail, setRememberEmail] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [kakaoLoading, setKakaoLoading] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -73,6 +75,17 @@ export default function LoginScreen() {
       Alert.alert('Google 로그인 실패', error.message ?? '다시 시도해주세요.');
     } finally {
       setGoogleLoading(false);
+    }
+  };
+
+  const handleKakaoLogin = async () => {
+    setKakaoLoading(true);
+    try {
+      await kakaoLogin();
+    } catch (error: any) {
+      Alert.alert('카카오 로그인 실패', error.message ?? '다시 시도해주세요.');
+    } finally {
+      setKakaoLoading(false);
     }
   };
 
@@ -165,6 +178,24 @@ export default function LoginScreen() {
             <>
               <Ionicons name="logo-google" size={20} color="#EA4335" />
               <Text className="text-base font-bold text-text-primary">Google로 계속하기</Text>
+            </>
+          )}
+        </Pressable>
+
+        <Pressable
+          onPress={handleKakaoLogin}
+          disabled={kakaoLoading}
+          className="flex-row items-center justify-center gap-3 rounded-pill py-4 active:scale-[0.98]"
+          style={{ backgroundColor: '#FEE500' }}
+        >
+          {kakaoLoading ? (
+            <ActivityIndicator color="#191919" />
+          ) : (
+            <>
+              <Ionicons name="chatbubble" size={18} color="#191919" />
+              <Text className="text-base font-bold" style={{ color: '#191919' }}>
+                카카오로 계속하기
+              </Text>
             </>
           )}
         </Pressable>

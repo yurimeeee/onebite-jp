@@ -20,6 +20,8 @@ node_modules
 dist/
 web-build/
 expo-env.d.ts
+/ios
+/android
 
 # Claude Code session state
 .claude/

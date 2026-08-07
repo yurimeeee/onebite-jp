@@ -14,9 +14,11 @@
       "backgroundColor": "#F8F8F8"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.onebite.japanese"
     },
     "android": {
+      "package": "com.onebite.japanese",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#F8F8F8"
@@ -31,7 +33,23 @@
       "expo-router",
       "expo-font",
       "expo-notifications",
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      [
+        "@react-native-seoul/kakao-login",
+        {
+          "kakaoAppKey": "37fbb1971c6cf31cf7d2b8200f6bcb77"
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "extraMavenRepos": [
+              "https://devrepo.kakao.com/nexus/content/groups/public/"
+            ]
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

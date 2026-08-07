@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { View, Text, ScrollView, Pressable } from "react-native";
+import { View, Text, ScrollView, Pressable, Image } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -149,14 +149,22 @@ export default function MyPageScreen() {
     >
       {/* 프로필 헤더 */}
       <View className="flex-row items-center gap-4">
-        <View
-          className="h-16 w-16 items-center justify-center rounded-pill"
-          style={{ backgroundColor: colors.pastelPinkLight }}
-        >
-          <Text className="text-2xl font-bold text-text-primary">
-            {displayName[0]?.toUpperCase()}
-          </Text>
-        </View>
+        {user?.photoURL ? (
+          <Image
+            source={{ uri: user.photoURL }}
+            className="h-16 w-16 rounded-pill"
+            style={{ backgroundColor: colors.pastelPinkLight }}
+          />
+        ) : (
+          <View
+            className="h-16 w-16 items-center justify-center rounded-pill"
+            style={{ backgroundColor: colors.pastelPinkLight }}
+          >
+            <Text className="text-2xl font-bold text-text-primary">
+              {displayName[0]?.toUpperCase()}
+            </Text>
+          </View>
+        )}
         <View className="flex-1">
           <Text className="text-2xl font-bold text-text-primary">{displayName}님</Text>
           <Text className="mt-0.5 text-text-secondary" numberOfLines={1}>
