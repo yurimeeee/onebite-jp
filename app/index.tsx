@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, Text, Pressable, TextInput, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, Pressable, TextInput, ScrollView, ActivityIndicator, Alert, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -81,6 +81,7 @@ export default function LoginScreen() {
       className="flex-1 bg-background"
       contentContainerStyle={{
         flexGrow: 1,
+        justifyContent: 'center',
         paddingHorizontal: 24,
         paddingTop: insets.top + 16,
         paddingBottom: insets.bottom + 24,
@@ -90,9 +91,11 @@ export default function LoginScreen() {
     >
       {/* 히어로 */}
       <View className="items-center py-6">
-        <View className="items-center justify-center w-16 h-16 rounded-card bg-pastel-lime">
-          <Ionicons name="restaurant" size={30} color={colors.textPrimary} />
-        </View>
+        <Image
+          source={require('@/assets/images/logo.png')}
+          style={{ width: 56, height: 56 }}
+          resizeMode="contain"
+        />
         <Text className="mt-4 text-3xl font-bold text-text-primary">원바이트</Text>
         <Text className="mt-2 text-sm leading-5 text-center text-text-secondary">매일 1분, 부담 없이 시작하는 하루 습관</Text>
       </View>
