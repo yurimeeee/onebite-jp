@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { View, Text, Pressable, ActivityIndicator } from "react-native";
+import { View, Text, Pressable, ActivityIndicator, ScrollView } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { FadeIn, SlideInDown } from "react-native-reanimated";
@@ -110,87 +110,89 @@ export default function BlankQuizScreen() {
   const selectedOption = options.find((o) => o.id === selectedId);
 
   return (
-    <View
-      className="flex-1 bg-background px-5"
-      style={{ paddingTop: insets.top + 8 }}
-    >
-      <QuizHeader
-        progress={index / total}
-        index={index + 1}
-        total={total}
-        onClose={() => safeBack(router)}
-      />
-
-      <Text className="mb-3 mt-8 text-base font-semibold text-text-secondary">
-        빈칸에 알맞은 말을 고르세요
-      </Text>
-
-      {/* 문장 카드 */}
-      <Animated.View
-        key={q.quizId}
-        entering={FadeIn.duration(300)}
-        style={{
-          borderRadius: 24,
-          backgroundColor: colors.surface,
-          padding: 28,
-          shadowColor: "#000",
-          shadowOpacity: 0.05,
-          shadowRadius: 12,
-          shadowOffset: { width: 0, height: 4 },
-          elevation: 2,
-        }}
+    <View style={{ flex: 1 }} className="bg-background">
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 20, paddingTop: insets.top + 8 }}
       >
-        <Text className="text-2xl leading-10 text-text-primary">
-          {before}
-          {blankMarker ? (
-            <Text
-              className="font-bold"
-              style={{
-                color: revealed
-                  ? isCorrect
-                    ? colors.success
-                    : colors.danger
-                  : colors.primary,
-              }}
-            >
-              {revealed ? selectedOption?.text ?? "___" : "___"}
-            </Text>
-          ) : null}
-          {after}
+        <QuizHeader
+          progress={index / total}
+          index={index + 1}
+          total={total}
+          onClose={() => safeBack(router)}
+        />
+
+        <Text className="mb-3 mt-8 text-base font-semibold text-text-secondary">
+          빈칸에 알맞은 말을 고르세요
         </Text>
-        <Text className="mt-2 text-text-secondary">{q.translation}</Text>
-      </Animated.View>
 
-      {!showHint && !revealed ? (
-        <Pressable
-          onPress={() => setShowHint(true)}
-          className="mt-4 self-center rounded-pill px-4 py-2"
-          style={{ backgroundColor: colors.pastelAmberLight }}
+        {/* 문장 카드 */}
+        <Animated.View
+          key={q.quizId}
+          entering={FadeIn.duration(300)}
+          style={{
+            borderRadius: 24,
+            backgroundColor: colors.surface,
+            padding: 28,
+            shadowColor: "#000",
+            shadowOpacity: 0.05,
+            shadowRadius: 12,
+            shadowOffset: { width: 0, height: 4 },
+            elevation: 2,
+          }}
         >
-          <Text className="text-sm font-bold text-text-primary">힌트 보기</Text>
-        </Pressable>
-      ) : null}
-      {showHint && !revealed ? (
-        <View
-          className="mt-4 rounded-2xl p-3"
-          style={{ backgroundColor: colors.pastelAmberLight }}
-        >
-          <Text className="text-center text-sm text-text-primary">{q.hint}</Text>
+          <Text className="text-2xl leading-10 text-text-primary">
+            {before}
+            {blankMarker ? (
+              <Text
+                className="font-bold"
+                style={{
+                  color: revealed
+                    ? isCorrect
+                      ? colors.success
+                      : colors.danger
+                    : colors.primary,
+                }}
+              >
+                {revealed ? selectedOption?.text ?? "___" : "___"}
+              </Text>
+            ) : null}
+            {after}
+          </Text>
+          <Text className="mt-2 text-text-secondary">{q.translation}</Text>
+        </Animated.View>
+
+        {!showHint && !revealed ? (
+          <Pressable
+            onPress={() => setShowHint(true)}
+            className="mt-4 self-center rounded-pill px-4 py-2"
+            style={{ backgroundColor: colors.pastelAmberLight }}
+          >
+            <Text className="text-sm font-bold text-text-primary">힌트 보기</Text>
+          </Pressable>
+        ) : null}
+        {showHint && !revealed ? (
+          <View
+            className="mt-4 rounded-2xl p-3"
+            style={{ backgroundColor: colors.pastelAmberLight }}
+          >
+            <Text className="text-center text-sm text-text-primary">{q.hint}</Text>
+          </View>
+        ) : null}
+
+        <View className="mt-6 gap-3">
+          {options.map((option) => (
+            <ChoiceButton
+              key={option.id}
+              label={`${option.text}  ${option.ko}`}
+              isCorrectAnswer={option.id === q.answerId}
+              isSelected={selectedId === option.id}
+              revealed={revealed}
+              onPress={() => onSelect(option.id)}
+            />
+          ))}
         </View>
-      ) : null}
-
-      <View className="mt-6 gap-3">
-        {options.map((option) => (
-          <ChoiceButton
-            key={option.id}
-            label={`${option.text}  ${option.ko}`}
-            isCorrectAnswer={option.id === q.answerId}
-            isSelected={selectedId === option.id}
-            revealed={revealed}
-            onPress={() => onSelect(option.id)}
-          />
-        ))}
-      </View>
+      </ScrollView>
 
       {/* 해설 슬라이드업 */}
       {revealed ? (

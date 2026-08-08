@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -100,9 +100,14 @@ export default function ReviewQuizScreen() {
 
   if (phase === "intro") {
     return (
-      <View
-        className="flex-1 bg-background px-5"
-        style={{ paddingTop: insets.top + 8, paddingBottom: insets.bottom + 12 }}
+      <ScrollView
+        className="flex-1 bg-background"
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingHorizontal: 20,
+          paddingTop: insets.top + 8,
+          paddingBottom: insets.bottom + 12,
+        }}
       >
         <ScreenHeader title="오답노트" subtitle="틀린 문제 다시 풀기" />
 
@@ -137,16 +142,21 @@ export default function ReviewQuizScreen() {
             <PillButton label="다시 풀기 시작" icon="play" onPress={startSession} />
           </View>
         ) : null}
-      </View>
+      </ScrollView>
     );
   }
 
   if (phase === "done") {
     const remaining = items.length;
     return (
-      <View
-        className="flex-1 bg-background px-6"
-        style={{ paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24 }}
+      <ScrollView
+        className="flex-1 bg-background"
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingHorizontal: 24,
+          paddingTop: insets.top + 24,
+          paddingBottom: insets.bottom + 24,
+        }}
       >
         <Text className="text-center text-2xl font-bold text-text-primary">복습 완료</Text>
         <View className="flex-1 items-center justify-center">
@@ -168,7 +178,7 @@ export default function ReviewQuizScreen() {
             onPress={() => router.replace("/(tabs)")}
           />
         </View>
-      </View>
+      </ScrollView>
     );
   }
 
@@ -177,9 +187,14 @@ export default function ReviewQuizScreen() {
   if (isWordLike && q.word) {
     const word = q.word;
     return (
-      <View
-        className="flex-1 bg-background px-5"
-        style={{ paddingTop: insets.top + 8, paddingBottom: insets.bottom + 12 }}
+      <ScrollView
+        className="flex-1 bg-background"
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingHorizontal: 20,
+          paddingTop: insets.top + 8,
+          paddingBottom: insets.bottom + 12,
+        }}
       >
         <QuizHeader
           progress={index / total}
@@ -234,7 +249,7 @@ export default function ReviewQuizScreen() {
           ))}
         </View>
 
-        <View className="flex-1 justify-end">
+        <View style={{ flex: 1, justifyContent: "flex-end" }}>
           {revealed ? (
             <Animated.View entering={FadeInDown.springify().damping(18)}>
               <PillButton
@@ -245,7 +260,7 @@ export default function ReviewQuizScreen() {
             </Animated.View>
           ) : null}
         </View>
-      </View>
+      </ScrollView>
     );
   }
 
@@ -259,68 +274,74 @@ export default function ReviewQuizScreen() {
     const selectedOption = blankOptions.find((o) => o.id === selected);
 
     return (
-      <View
-        className="flex-1 bg-background px-5"
-        style={{ paddingTop: insets.top + 8 }}
-      >
-        <QuizHeader
-          progress={index / total}
-          index={index + 1}
-          total={total}
-          onClose={() => safeBack(router)}
-        />
-
-        <Text className="mb-3 mt-8 text-base font-semibold text-text-secondary">
-          빈칸에 알맞은 말을 고르세요
-        </Text>
-
-        <Animated.View
-          key={quiz.quizId}
-          entering={FadeIn.duration(300)}
-          style={{
-            borderRadius: 24,
-            backgroundColor: colors.surface,
-            padding: 28,
-            shadowColor: "#000",
-            shadowOpacity: 0.05,
-            shadowRadius: 12,
-            shadowOffset: { width: 0, height: 4 },
-            elevation: 2,
+      <View style={{ flex: 1 }} className="bg-background">
+        <ScrollView
+          className="flex-1"
+          contentContainerStyle={{
+            flexGrow: 1,
+            paddingHorizontal: 20,
+            paddingTop: insets.top + 8,
           }}
         >
-          <Text className="text-2xl leading-10 text-text-primary">
-            {before}
-            {blankMarker ? (
-              <Text
-                className="font-bold"
-                style={{
-                  color: revealed
-                    ? isCorrect
-                      ? colors.success
-                      : colors.danger
-                    : colors.primary,
-                }}
-              >
-                {revealed ? selectedOption?.text ?? "___" : "___"}
-              </Text>
-            ) : null}
-            {after}
-          </Text>
-          <Text className="mt-2 text-text-secondary">{quiz.translation}</Text>
-        </Animated.View>
+          <QuizHeader
+            progress={index / total}
+            index={index + 1}
+            total={total}
+            onClose={() => safeBack(router)}
+          />
 
-        <View className="mt-6 gap-3">
-          {blankOptions.map((option) => (
-            <ChoiceButton
-              key={option.id}
-              label={`${option.text}  ${option.ko}`}
-              isCorrectAnswer={option.id === quiz.answerId}
-              isSelected={selected === option.id}
-              revealed={revealed}
-              onPress={() => onSelectBlank(option.id)}
-            />
-          ))}
-        </View>
+          <Text className="mb-3 mt-8 text-base font-semibold text-text-secondary">
+            빈칸에 알맞은 말을 고르세요
+          </Text>
+
+          <Animated.View
+            key={quiz.quizId}
+            entering={FadeIn.duration(300)}
+            style={{
+              borderRadius: 24,
+              backgroundColor: colors.surface,
+              padding: 28,
+              shadowColor: "#000",
+              shadowOpacity: 0.05,
+              shadowRadius: 12,
+              shadowOffset: { width: 0, height: 4 },
+              elevation: 2,
+            }}
+          >
+            <Text className="text-2xl leading-10 text-text-primary">
+              {before}
+              {blankMarker ? (
+                <Text
+                  className="font-bold"
+                  style={{
+                    color: revealed
+                      ? isCorrect
+                        ? colors.success
+                        : colors.danger
+                      : colors.primary,
+                  }}
+                >
+                  {revealed ? selectedOption?.text ?? "___" : "___"}
+                </Text>
+              ) : null}
+              {after}
+            </Text>
+            <Text className="mt-2 text-text-secondary">{quiz.translation}</Text>
+          </Animated.View>
+
+          <View className="mt-6 gap-3">
+            {blankOptions.map((option) => (
+              <ChoiceButton
+                key={option.id}
+                label={`${option.text}  ${option.ko}`}
+                isCorrectAnswer={option.id === quiz.answerId}
+                isSelected={selected === option.id}
+                revealed={revealed}
+                onPress={() => onSelectBlank(option.id)}
+              />
+            ))}
+          </View>
+        </ScrollView>
 
         {revealed ? (
           <Animated.View

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { View, Text, Pressable, ActivityIndicator } from "react-native";
+import { View, Text, Pressable, ActivityIndicator, ScrollView } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -140,9 +140,14 @@ export default function ListenQuizScreen() {
   }
 
   return (
-    <View
-      className="flex-1 bg-background px-5"
-      style={{ paddingTop: insets.top + 8, paddingBottom: insets.bottom + 12 }}
+    <ScrollView
+      className="flex-1 bg-background"
+      contentContainerStyle={{
+        flexGrow: 1,
+        paddingHorizontal: 20,
+        paddingTop: insets.top + 8,
+        paddingBottom: insets.bottom + 12,
+      }}
     >
       <QuizHeader
         progress={index / total}
@@ -217,7 +222,7 @@ export default function ListenQuizScreen() {
         ))}
       </View>
 
-      <View className="flex-1 justify-end">
+      <View style={{ flex: 1, justifyContent: "flex-end" }}>
         {revealed ? (
           <Animated.View entering={FadeInDown.springify().damping(18)}>
             <PillButton
@@ -228,7 +233,7 @@ export default function ListenQuizScreen() {
           </Animated.View>
         ) : null}
       </View>
-    </View>
+    </ScrollView>
   );
 }
 

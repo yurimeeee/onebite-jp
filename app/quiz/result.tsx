@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text } from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -51,9 +51,14 @@ export default function ResultScreen() {
     : { text: "조금 더 힘내볼까요", bg: colors.pastelPeach };
 
   return (
-    <View
-      className="flex-1 bg-background px-6"
-      style={{ paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24 }}
+    <ScrollView
+      className="flex-1 bg-background"
+      contentContainerStyle={{
+        flexGrow: 1,
+        paddingHorizontal: 24,
+        paddingTop: insets.top + 24,
+        paddingBottom: insets.bottom + 24,
+      }}
     >
       {passed ? <Confetti /> : null}
 
@@ -137,7 +142,7 @@ export default function ResultScreen() {
         dateLabel={formatToday()}
         fileName="onebite-quiz-result"
       />
-    </View>
+    </ScrollView>
   );
 }
 

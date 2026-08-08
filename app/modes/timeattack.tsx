@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { View, Text, ActivityIndicator } from "react-native";
+import { View, Text, ActivityIndicator, ScrollView } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -181,9 +181,14 @@ export default function TimeAttackScreen() {
   if (phase === "done") {
     const percent = Math.round((correctCount / total) * 100);
     return (
-      <View
-        className="flex-1 bg-background px-6"
-        style={{ paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24 }}
+      <ScrollView
+        className="flex-1 bg-background"
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingHorizontal: 24,
+          paddingTop: insets.top + 24,
+          paddingBottom: insets.bottom + 24,
+        }}
       >
         <Text className="text-center text-2xl font-bold text-text-primary">
           타임어택 완료!
@@ -210,7 +215,7 @@ export default function TimeAttackScreen() {
             onPress={() => router.replace("/(tabs)")}
           />
         </View>
-      </View>
+      </ScrollView>
     );
   }
 
@@ -219,9 +224,14 @@ export default function TimeAttackScreen() {
     remaining < 1500 ? colors.danger : remaining < 3000 ? colors.pastelAmber : colors.primary;
 
   return (
-    <View
-      className="flex-1 bg-background px-5"
-      style={{ paddingTop: insets.top + 8, paddingBottom: insets.bottom + 12 }}
+    <ScrollView
+      className="flex-1 bg-background"
+      contentContainerStyle={{
+        flexGrow: 1,
+        paddingHorizontal: 20,
+        paddingTop: insets.top + 8,
+        paddingBottom: insets.bottom + 12,
+      }}
     >
       <QuizHeader
         progress={index / total}
@@ -289,6 +299,6 @@ export default function TimeAttackScreen() {
           />
         ))}
       </View>
-    </View>
+    </ScrollView>
   );
 }
